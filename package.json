@@ -1,0 +1,50 @@
+{
+  "name": "typescript-typelevel",
+  "version": "0.1.0",
+  "description": "Lift your code to the next level.",
+  "keywords": [
+    "type level programming",
+    "typescript",
+    "utility types"
+  ],
+  "files": [
+    "lib",
+    "src"
+  ],
+  "types": "lib/index.d.ts",
+  "main": "lib/index.js",
+  "source": "src/index.ts",
+  "scripts": {
+    "prepare": "npm run clean && npm run build && npm run lint",
+    "build": "tsc",
+    "clean": "shx rm -rf lib",
+    "coverage": "vitest run --coverage",
+    "lint": "eslint src test --ext .ts",
+    "test": "vitest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/danieldietrich/typelevel.git"
+  },
+  "homepage": "https://typelevel.io",
+  "bugs": {
+    "url": "https://github.com/danieldietrich/typelevel/issues"
+  },
+  "author": {
+    "name": "Daniel Dietrich",
+    "email": "cafebab3@gmail.com",
+    "url": "https://danieldietrich.dev"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.38.1",
+    "@typescript-eslint/parser": "^5.38.1",
+    "@vitest/coverage-c8": "^0.23.2",
+    "eslint": "^8.24.0",
+    "eslint-plugin-typescript-enum": "^2.1.0",
+    "eslint-plugin-unused-imports": "^2.0.0",
+    "shx": "^0.3.4",
+    "typescript": "^4.8.4",
+    "vitest": "^0.23.2"
+  }
+}
