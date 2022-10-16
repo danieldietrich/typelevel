@@ -4,9 +4,12 @@
  * terms of the MIT License, which is available in the project root.
  ******************************************************************************/
 
+// type level API
 export * from './arrays';
-export * from './assert';
 export * from './functions';
 export * from './objects';
 export * from './utilities';
 export * from './validation';
+
+// test helpers
+export * from './assert';
