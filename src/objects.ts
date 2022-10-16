@@ -43,10 +43,10 @@ export type Map<T = any, R = unknown> = [unknown] extends [T] ? unknown : R;
 export type FlatMap<T = any, R = unknown> = Flatten<Map<T, R>>;
 
 // Flattens union types
-export type Flatten<T extends Map> = Union<UnionToIntersection<T>>;
+export type Flatten<T extends Map> = Join<UnionToIntersection<T>>;
 
 // Merges all properties of an intersection type A & B
-export type Union<T> = T extends Obj ? { [K in keyof T]:  T[K] } : T;
+export type Join<T> = T extends Obj ? { [K in keyof T]:  T[K] } : T;
 
 export type Filter<T, V> =
     T extends any[] ? FilterArray<T, V> :
