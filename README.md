@@ -21,7 +21,7 @@
 <br/>
 <br/>
 
-**TypeLevel** shifts the work from the TypeScript runtime to the compiler. **TypeLevel** provides a highly composable type level language and tests at compile time. Developers benefit from faster page loads and reduced provider costs when compiling their code to JS.
+**TypeLevel** shifts the work from the TypeScript runtime to the compiler. Developers benefit from faster page loads and reduced provider costs when compiling their code to JS. **TypeLevel** provides a highly composable type level language and tests at compile time.
 
 ## Usage
 
@@ -41,4 +41,4 @@ type Hi<T extends string> = `Hi ${T}!`;
 assertType<Extends<Hi<'TypeLevel'>, string>>();
 ```
 
-Learn more about [typelevel.io](https://typelevel.io).
+Visit [typelevel.io](https://typelevel.io) to learn more...
