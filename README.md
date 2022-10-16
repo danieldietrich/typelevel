@@ -31,7 +31,7 @@ Install **TypeLevel**
 npm i -D typescript-typelevel
 ```
 
-Start to code ([try it out](https://shorturl.at/ioqv0))
+Start to code ([try it out](https://www.typescriptlang.org/play?#code/JYWwDg9gTgLgBAbzgSQM5wL5wGZQiOAchgE8wBTVAYymDBgFpSKAbcgN3JcIG4AoPgHpBcKhDAlBYAIaoY5ODAAWwdNgCuAOyoxgETXw3bd+uLNTlYAFTLkAPAH0rcALyKo68gD4AFAEoALjh2CGAAE0QMAWE4MDxsYBg+ZgUACWA7Z3IAD3lNMPQ5Wk0Acy9XOAADdLgAEgQrDABCSv4+c0sYGwo7NDt0u0Ju8gAZDi5CLwAaIhrhsc4WJsnfP34gA))
 
 ```ts
 import { Is } from 'typescript-typelevel';
