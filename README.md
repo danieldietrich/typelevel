@@ -31,14 +31,14 @@ Install **TypeLevel**
 npm i -D typescript-typelevel
 ```
 
-Start to code
+Start to code ([try it out](https://shorturl.at/ioqv0))
 
 ```ts
-import TypeLevel from 'typescript-typelevel';
+import { assertType, Is } from 'typescript-typelevel';
 
 type Hi<T extends string> = `Hi ${T}!`;
 
-assertType<Extends<Hi<'TypeLevel'>, string>>();
+assertType<Is<Hi<'TypeLevel'>, 'Hi TypeLevel!'>>();
 ```
 
 Visit [typelevel.io](https://typelevel.io) to learn more...
