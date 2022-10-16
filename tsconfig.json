@@ -11,6 +11,6 @@
     "skipLibCheck": true,         // skip type checking all .d.ts files
     "strict": true                // enable all strict type-checking options
   },
-  "include": ["src/**/*.ts", "src/assert.ts"],
+  "include": ["src/**/*.ts"],
   "exclude": ["node_modules", "lib"]
 }
