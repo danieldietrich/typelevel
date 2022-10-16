@@ -12,27 +12,21 @@ export type IsEmpty<T> = [keyof T] extends [never] ? true : false;
 export type Obj = Record<PropertyKey, unknown>;
 
 export type Paths<T, P = TupledPaths<T>> =
-    IsEmpty<T> extends true ? {} :
-        Flatten<UnionToIntersection<P extends [string, unknown]
-            ? { [K in `${P[0]}`]: P[1] }
-            : never
-        >>;
+    P extends [string, unknown]
+        ? { [K in `${P[0]}`]: P[1] }
+        : never;
 
 // currently symbol keys are not supported
 type TupledPaths<T, K = keyof T> =
     T extends Obj
         ? K extends string | number
-            ? Is<T[K], never> extends true
-                ? [`${K}`, never]
-                : Is<T[K], {}> extends true
-                    ? [`${K}`, {}]
-                    : T[K] extends Record<string | number, unknown>
-                        ? TupledPaths<T[K]> extends infer F
-                            ? F extends [string, unknown]
-                                ? [`${K}.${F[0]}`, F[1]]
-                                : never
-                            : never
-                        : [`${K}`, T[K]]
+            ? T[K] extends Record<string | number, unknown>
+                ? TupledPaths<T[K]> extends infer F
+                    ? F extends [string, unknown]
+                        ? [`${K}.${F[0]}`, F[1]]
+                        : never
+                    : never
+                : [`${K}`, T[K]]
             : never
         : never;
 
