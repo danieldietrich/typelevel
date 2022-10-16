@@ -22,7 +22,5 @@
 <br/>
 
 <div id="link" align="center">
-  <h3>
-    <button><span style="color:white">https://typelevel.io</span></button>
-  </h3>
+  (click on the logo)
 </div>
