@@ -21,6 +21,24 @@
 <br/>
 <br/>
 
-<div id="link" align="center">
-  (click on the logo)
-</div>
+**TypeLevel** shifts the work from the TypeScript runtime to the compiler. **TypeLevel** provides a highly composable type level language and tests at compile time. Developers benefit from faster page loads and reduced provider costs when compiling their code to JS.
+
+## Usage
+
+Install **TypeLevel**
+
+```sh
+npm i -D typescript-typelevel
+```
+
+Start to code
+
+```ts
+import TypeLevel from 'typescript-typelevel';
+
+type Hi<T extends string> = `Hi ${T}!`;
+
+assertType<Extends<Hi<'TypeLevel'>, string>>();
+```
+
+Learn more about [typelevel.io](https://typelevel.io).
