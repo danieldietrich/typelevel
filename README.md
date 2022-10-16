@@ -34,8 +34,12 @@ npm i -D typescript-typelevel
 Start to code ([try it out](https://shorturl.at/ioqv0))
 
 ```ts
-import { assertType, Is } from 'typescript-typelevel';
+import { Is } from 'typescript-typelevel';
 
+// copy/paste this function
+function assertType<_T = true>(): void {}
+
+// profit
 type Hi<T extends string> = `Hi ${T}!`;
 
 assertType<Is<Hi<'TypeLevel'>, 'Hi TypeLevel!'>>();

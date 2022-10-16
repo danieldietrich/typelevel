@@ -5,10 +5,11 @@
  ******************************************************************************/
 
 import { describe, it } from 'vitest'
-import { assertType } from '../src/assert';
 import { MergeArray } from '../src/arrays';
 import { Fn } from '../src/functions';
 import { Is } from '../src';
+
+function assertType<_T = true>(): void {}
 
 describe('type MergeArray', () => {
 

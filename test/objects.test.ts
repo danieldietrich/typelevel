@@ -6,9 +6,10 @@
 
 import { Fn } from 'tinybench';
 import { describe, it } from 'vitest'
-import { assertType } from '../src/assert';
 import { Is } from '../src';
 import { Merge } from '../src/objects';
+
+function assertType<_T = true>(): void {}
 
 describe('type Merge', () => {
 
