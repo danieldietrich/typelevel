@@ -114,3 +114,6 @@ type MergeObjects<S, T> =
             ? (K extends keyof T ? Merge<S[K], T[K]> : S[K])
             : (K extends keyof T ? T[K] : never)
     }>;
+
+// returns the property values of the first level
+export type Values<T> = T[keyof T];
