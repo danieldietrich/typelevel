@@ -21,7 +21,7 @@
 <br/>
 <br/>
 
-**TypeLevel** shifts the work from the TypeScript runtime to the compiler. Developers benefit from faster page loads and reduced provider costs when compiling their code to JS. **TypeLevel** provides a highly composable type level language and tests at compile time.
+**TypeLevel** pushes energy from the JavaScript runtime to the TypeScrip compiler. **TypeLevel** offers a highly composable type level API and tests at compile time. Developers benefit from faster page loads and reduced provider costs, the compiler erases the types.
 
 ## Usage
 
