@@ -4,7 +4,7 @@
  * terms of the MIT License, which is available in the project root.
  ******************************************************************************/
 
-import { Filter, Map } from "./objects";
+import { Filter, Join, Map } from "./objects";
 
 export type ValidationResult<A, V extends (A | ValidationError)[], K extends PropertyKey = 'typelevel_error' , E = Filter<V, ValidationError>> =
     E extends [] ? A : {
@@ -12,4 +12,4 @@ export type ValidationResult<A, V extends (A | ValidationError)[], K extends Pro
     };
 
 export type ValidationError<Message extends string = any, Cause = unknown, Help = unknown> =
-    { message: Message } & Map<Cause, { cause: Cause }> & Map<Help, { help: Help }>;
+    Join<{ message: Message } & Map<Cause, { cause: Cause }> & Map<Help, { help: Help }>>;
