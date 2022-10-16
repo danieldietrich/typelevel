@@ -108,7 +108,8 @@ type MergeFunctions<S extends Fn, T extends Fn> =
             : never
         : never;
 
-type MergeObjects<S, T> =
+// TODO(@@dd): Workaround for infinite deep type error when calling Merge. Remove `export` and use Merge instead.
+export type MergeObjects<S, T> =
     Flatten<{
         [K in keyof S | keyof T]: K extends keyof S
             ? (K extends keyof T ? Merge<S[K], T[K]> : S[K])
