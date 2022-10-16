@@ -4,12 +4,11 @@
  * terms of the MIT License, which is available in the project root.
  ******************************************************************************/
 
+import { assertType } from 'typelevel-assert';
 import { describe, it } from 'vitest'
 import { MergeArray } from '../src/arrays';
 import { Fn } from '../src/functions';
 import { Is } from '../src';
-
-function assertType<_T = true>(): void {}
 
 describe('type MergeArray', () => {
 

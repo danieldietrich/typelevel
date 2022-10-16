@@ -4,12 +4,11 @@
  * terms of the MIT License, which is available in the project root.
  ******************************************************************************/
 
+import { assertType } from 'typelevel-assert';
 import { Fn } from 'tinybench';
 import { describe, it } from 'vitest'
 import { Is } from '../src';
 import { Merge } from '../src/objects';
-
-function assertType<_T = true>(): void {}
 
 describe('type Merge', () => {
 
