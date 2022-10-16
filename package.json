@@ -12,7 +12,6 @@
     "src"
   ],
   "types": "lib/index.d.ts",
-  "main": "lib/index.js",
   "source": "src/index.ts",
   "scripts": {
     "prepare": "npm run clean && npm run build && npm run lint",

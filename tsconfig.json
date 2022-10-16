@@ -7,8 +7,8 @@
     "outDir": "./lib",            // *.d.ts goes here
     "declaration": true,          // gnerates corresponding '.d.ts' file
     "declarationMap": true,       // generates a sourcemap for each corresponding '.d.ts' file
+    "emitDeclarationOnly": true,  // don't generate '.js' files
     "skipLibCheck": true,         // skip type checking all .d.ts files
-    "sourceMap": true,            // generates a sourcemap for each corresponding '.ts' file
     "strict": true                // enable all strict type-checking options
   },
   "include": ["src/**/*.ts", "src/assert.ts"],
