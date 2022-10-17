@@ -4,8 +4,7 @@
  * terms of the MIT License, which is available in the project root.
  ******************************************************************************/
 
-import { Fn } from "./functions";
-import { Is, Or, UnionToIntersection } from "./utilities";
+import { UnionToIntersection } from "./utilities";
 
 export type IsEmpty<T> = [keyof T] extends [never] ? true : false;
 
@@ -71,44 +70,6 @@ type FilterNotArray<A extends any[], V> =
                 ? FilterNotArray<T, V>
                 : [H, ...FilterNotArray<T, V>]
             : [];
-
-export type Merge<S, T> =
-    Is<S, T> extends true ? S : // identity
-        Is<T, void> extends true ? S : // if target expects nothing it is ok to provide something
-            Or<Is<S, never>, Is<T, never>> extends true ? never :
-                Is<S, unknown> extends true ? unknown : Is<T, unknown> extends true ? S :
-                    Is<S, any> extends true ? any : Is<T, any> extends true ? S :
-                        S extends any[] ? (T extends any[] ? MergeArrays<S, T> : (S extends T ? S : never)) :
-                            S extends Fn ? (T extends Fn ? MergeFunctions<S, T> : (S extends T ? S : never)) :
-                                S extends Obj ? (T extends Obj ? MergeObjects<S, T> : (S extends T ? S : never)) :
-                                    S extends T ? S : never;
-
-// Consumers of T expect a certain abount of elements.
-// It is required that S has at less or equal elements as T.
-// It is sufficient, if elements of S extend elements of T.
-type MergeArrays<S extends any[], T extends any[]> =
-    S extends [infer HeadS, ...infer TailS]
-        ? T extends [infer HeadT, ...infer TailT]
-            ? [Merge<HeadS, HeadT>, ...MergeArrays<TailS, TailT>]
-            : [never] // T = [], users which expect T don't provide more elements required by S
-        : []; // S = [], S ignores additions elements required by users of T
-
-type MergeFunctions<S extends Fn, T extends Fn> =
-    S extends (...args: infer ArgsS) => infer ResS
-        ? T extends (...args: infer ArgsT) => infer ResT
-            ? Merge<ArgsS, ArgsT> extends infer A
-                ? A extends any[] ? (...args: A) => Merge<ResS, ResT> : never
-                : never
-            : never
-        : never;
-
-// TODO(@@dd): Workaround for infinite deep type error when calling Merge. Remove `export` and use Merge instead.
-export type MergeObjects<S, T> =
-    Flatten<{
-        [K in keyof S | keyof T]: K extends keyof S
-            ? (K extends keyof T ? Merge<S[K], T[K]> : S[K])
-            : (K extends keyof T ? T[K] : never)
-    }>;
 
 // returns the property values of the first level
 export type Values<T> = T[keyof T];
