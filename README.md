@@ -21,11 +21,11 @@
 <br/>
 <br/>
 
-**TypeLevel** pushes energy from the JavaScript runtime to the TypeScript compiler. The highly composable type level API not only feels like superpower - the "real" code is freed from unnecessary ballast.
+<tt>**&lt;TypeLevel&gt;**</tt> pushes energy from the JavaScript runtime to the TypeScript compiler. The highly composable type level API not only feels like superpower - _the-real-code™_ is freed from unnecessary ballast.
 
 ## Usage
 
-Install **TypeLevel**
+Install <tt>**&lt;TypeLevel&gt;**</tt>
 
 ```sh
 npm i -D typescript-typelevel
