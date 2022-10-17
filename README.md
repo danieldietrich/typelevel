@@ -36,7 +36,7 @@ Visit [typelevel.io](https://typelevel.io) to learn more...
 ## Example
 
 <div>
-  This is a typical unit test with a <strong>type assertion</strong>. The <strong>assertType&lt;T></strong> utility has a generic type parameter <strong>T</strong> of type <strong>true</strong> <em>(yes, true is a type on its own in TypeScript)</em>. If a type instance of the parameter <strong>T</strong> is <strong>false</strong>, the compiler issues an error.
+  This is a typical unit test with a <strong>type assertion</strong> imported from our companion project <a alt="typelevel-assert link" href="https://github.com/danieldietrich/typelevel-assert">typelevel-assert</a>. The <strong>assertType&lt;T></strong> utility has a generic type parameter <strong>T</strong> of type <strong>true</strong> <em>(yes, true is a type on its own in TypeScript)</em>. If a type instance of the parameter <strong>T</strong> is <strong>false</strong>, the compiler issues an error.
   <img width="786" alt="ginject-assert-type-0-test" src="https://user-images.githubusercontent.com/743833/196083451-de0c3220-10a7-4ee1-95d8-77ea7bc38833.png">
 </div>
 
