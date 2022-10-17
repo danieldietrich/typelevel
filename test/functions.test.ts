@@ -4,4 +4,12 @@
  * terms of the MIT License, which is available in the project root.
  ******************************************************************************/
 
-TODO(@@dd)
+import { describe, it } from "vitest";
+
+describe('', () => {
+
+    it('should ...', () => {
+        // TODO(@@dd)
+    });
+
+});
