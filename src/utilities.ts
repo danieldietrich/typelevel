@@ -9,15 +9,13 @@ export type Is<T1, T2> =
     (<T>() => T extends T2 ? true : false) extends (<T>() => T extends T1 ? true : false)
         ? true
         : false;
-
-// returns true if T1 is a subtype of T2 (read: T1 is assignable to T2)
 export type Extends<A1, A2> =
-    [A1] extends [never] ? true :
-        [A2] extends [never] ? false :
-            [any] extends [A2] ? true :
-                [unknown] extends [A2] ? true :
-                    [any] extends [A1] ? false :
-                        [unknown] extends [A1] ? false :
+    Is<A1, never> extends true ? true :
+        Is<A2, never> extends true ? false :
+            Is<A2, any> extends true ? true :
+                Is<A2, unknown> extends true ? true :
+                    Is<A1, any> extends true ? false :
+                        Is<A1, unknown> extends true ? false :
                             A1 extends A2 ? true : false;
 
 // logical and
