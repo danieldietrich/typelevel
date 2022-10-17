@@ -1,6 +1,6 @@
 <div id="typelevel-logo" align="center">
   <a href="https://github.com/danieldietrich/typelevel">
-    <img alt="Typelevel Logo" width="450" src="https://user-images.githubusercontent.com/743833/196013156-9158e0d0-93eb-4615-a29c-dec51513a37b.png">
+    <img alt="TypeLevel Logo" width="450" src="https://user-images.githubusercontent.com/743833/196072270-a13bf140-d4fa-47ef-8b07-ba4c88ba92ca.png">
   </a>
   <h3>
     Lift your code to the next level.
