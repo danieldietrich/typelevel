@@ -6,10 +6,10 @@
 
 import { Filter, Join, Map } from "./objects";
 
-export type CheckResult<A, V extends (A | TypeError)[], K extends PropertyKey = 'typelevel_error' , E = Filter<V, TypeError>> =
+export type CheckResult<A, V extends (A | CheckError)[], K extends PropertyKey = 'typelevel_error' , E = Filter<V, CheckError>> =
     E extends [] ? A : {
         [Key in K]: E
     };
 
-export type TypeError<Message extends string = any, Cause = unknown, Help = unknown> =
+export type CheckError<Message extends string = any, Cause = unknown, Help = unknown> =
     Join<{ message: Message } & Map<Cause, { cause: Cause }> & Map<Help, { help: Help }>>;
