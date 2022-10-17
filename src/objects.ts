@@ -41,34 +41,22 @@ export type Flatten<T extends Map> = Join<UnionToIntersection<T>>;
 // Merges all properties of an intersection type A & B
 export type Join<T> = T extends Obj ? { [K in keyof T]:  T[K] } : T;
 
-export type Filter<T, V> =
-    T extends any[] ? FilterArray<T, V> :
-        T extends Obj ? FilterObj<T, V> :
+export type Filter<T, V, Condition extends boolean = true> =
+    T extends any[] ? FilterArray<T, V, Condition> :
+        T extends Obj ? FilterObj<T, V, Condition> :
             never;
 
-export type FilterNot<T, V> =
-    T extends any[] ? FilterNotArray<T, V> :
-        T extends Obj ? FilterNotObj<T, V> :
-            never;
+type FilterObj<T, V, Condition> = Pick<T, { [K in keyof T]-?: T[K] extends V
+    ? Condition extends true ? K : never
+    : Condition extends true ? never : K
+}[keyof T]>;
 
-type FilterObj<T, V> = Pick<T, { [K in keyof T]-?: T[K] extends V ? K : never }[keyof T]>;
-
-type FilterNotObj<T, V> = Pick<T, { [K in keyof T]-?: T[K] extends V ? never : K }[keyof T]>;
-
-type FilterArray<A extends any[], V> =
+type FilterArray<A extends any[], V, Condition extends boolean = true> =
     A extends [] ? [] :
         A extends [infer H, ...infer T]
             ? H extends V
-                ? [H, ...FilterArray<T, V>]
-                : FilterArray<T, V>
-            : [];
-
-type FilterNotArray<A extends any[], V> =
-    A extends [] ? [] :
-        A extends [infer H, ...infer T]
-            ? H extends V
-                ? FilterNotArray<T, V>
-                : [H, ...FilterNotArray<T, V>]
+                ? Condition extends true ? [H, ...FilterArray<T, V>] : FilterArray<T, V>
+                : Condition extends true ? FilterArray<T, V> : [H, ...FilterArray<T, V>]
             : [];
 
 // returns the property values of the first level
