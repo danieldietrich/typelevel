@@ -15,7 +15,7 @@
   "source": "src/index.ts",
   "scripts": {
     "prepare": "npm run clean && npm run build && npm run lint",
-    "build": "tsc",
+    "build": "tsc",    
     "clean": "shx rm -rf lib",
     "coverage": "vitest run --coverage",
     "lint": "eslint src test --ext .ts",
