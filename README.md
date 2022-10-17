@@ -21,7 +21,7 @@
 <br/>
 <br/>
 
-<tt>**&lt;TypeLevel&gt;**</tt> pushes energy from the JavaScript runtime to the TypeScript compiler. The highly composable type level API not only feels like superpower - _the-real-code™_ is freed from unnecessary ballast.
+<tt>**&lt;TypeLevel&gt;**</tt> pushes energy from the JavaScript runtime to the TypeScript compiler. The highly composable type level API not only feels like superpower, _the-real-code™_ is freed from unnecessary ballast.
 
 ## Usage
 
