@@ -7,5 +7,5 @@
 export * from './arrays';
 export * from './functions';
 export * from './objects';
+export * from './type-checker';
 export * from './utilities';
-export * from './validation';
