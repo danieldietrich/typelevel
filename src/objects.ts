@@ -4,23 +4,27 @@
  * terms of the MIT License, which is available in the project root.
  ******************************************************************************/
 
+import { Is, Or } from "./predicates";
 import { UnionToIntersection } from "./utilities";
 
+/**
+ * A type with a set of properties PropertyKey of type unknown.
+ * Classes, arrays, functions and primitives are not of this
+ */
 export type Obj = Record<PropertyKey, unknown>;
 
-export type IsEmpty<T> =
-    Is<T, any> extends true ? boolean :
-        Is<T, unknown> extends true ? unknown :
-            Is<T, never> extends true ? never :
-                [T] extends [[]] ? true :
-                    [Keys<T>] extends [never] ? true : false;
-
-// returns a union of keys of T.
-// good alternative to keyof T if users want to get rid of special handling of T in any | never at the use-site.
+/**
+ * Good alternative to keyof T if users want to get rid of special handling of T in any | never at the use-site.
+ * @param T a type
+ * @returns keyof T, never if any/unknown/never
+ */
 export type Keys<T> =
     Or<Is<T, any>, Is<T, never>> extends true ? never : keyof T;
 
-// returns the property values of the first level
+/**
+ * Syntactic sugar for T[keyof T].
+ * @returns T[keyof T], [any, unknown, never] => [any, never, never]
+ */
 export type Values<T> = T[keyof T];
 
 // deep-flattens the keys
@@ -79,40 +83,3 @@ type FilterArray<A extends any[], V, Condition extends boolean> =
                 ? Condition extends true ? [H, ...FilterArray<T, V, Condition>] : FilterArray<T, V, Condition>
                 : Condition extends true ? FilterArray<T, V, Condition> : [H, ...FilterArray<T, V, Condition>]
             : [];
-
-// predicates
-
-// returns true if T1 is exactly T2
-export type Is<T1, T2> =
-    (<T>() => T extends T2 ? true : false) extends (<T>() => T extends T1 ? true : false)
-        ? true
-        : false;
-
-export type Extends<A1, A2> =
-    Is<A1, never> extends true ? true :
-        Is<A2, never> extends true ? false :
-            Is<A2, any> extends true ? true :
-                Is<A2, unknown> extends true ? true :
-                    Is<A1, any> extends true ? false :
-                        Is<A1, unknown> extends true ? false :
-                            A1 extends A2 ? true : false;
-
-// logical and
-export type And<C1 extends boolean, C2 extends boolean> =
-    C1 extends true
-        ? C2 extends true
-            ? true
-            : false
-        : false;
-
-// logical or
-export type Or<C1 extends boolean, C2 extends boolean> =
-    C1 extends true
-        ? true
-        : C2 extends true
-            ? true
-            : false;
-
-// logical not
-export type Not<C extends boolean> =
-    C extends true ? false : true;
