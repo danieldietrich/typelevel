@@ -4,29 +4,44 @@
  * terms of the MIT License, which is available in the project root.
  ******************************************************************************/
 
-import { Fn } from "./functions";
-import { Is, Or, UnionToIntersection } from "./utilities";
-
-export type IsEmpty<T> = [keyof T] extends [never] ? true : false;
+import { UnionToIntersection } from "./utilities";
 
 export type Obj = Record<PropertyKey, unknown>;
 
+export type IsEmpty<T> =
+    [T] extends [[]] ? true :
+        [Keys<T>] extends [never] ? true : false;
+
+// returns a union of keys of T.
+// good alternative to keyof T if users want to get rid of special handling of T in any | never at the use-site.
+export type Keys<T> =
+    Or<Is<T, any>, Is<T, never>> extends true ? never : keyof T;
+
+// returns the property values of the first level
+export type Values<T> = T[keyof T];
+
+// deep-flattens the keys
 export type Paths<T, P = TupledPaths<T>> =
-    P extends [string, unknown]
-        ? { [K in `${P[0]}`]: P[1] }
-        : never;
+    // TODO(@@dd): write `Exists<any | unknown | never | {}, T> extends true` instead
+    Or<Is<T, {}>, Or<Is<T, any>, Or<Is<T, unknown>, Is<T, never>>>> extends true
+        ? T
+        : P extends [string, unknown]
+            ? { [K in `${P[0]}`]: P[1] }
+            : never;
 
 // currently symbol keys are not supported
-type TupledPaths<T, K = keyof T> =
+type TupledPaths<T, K = Keys<T>> =
     T extends Obj
         ? K extends string | number
-            ? T[K] extends Record<string | number, unknown>
-                ? TupledPaths<T[K]> extends infer F
-                    ? F extends [string, unknown]
-                        ? [`${K}.${F[0]}`, F[1]]
+            ? Or<Is<T[K], any>, Is<T[K], never>> extends true
+                ? [`${K}`, T[K]]
+                : T[K] extends Record<string | number, unknown>
+                    ? TupledPaths<T[K]> extends infer F
+                        ? F extends [string, unknown]
+                            ? [`${K}.${F[0]}`, F[1]]
+                            : never
                         : never
-                    : never
-                : [`${K}`, T[K]]
+                    : [`${K}`, T[K]]
             : never
         : never;
 
@@ -40,75 +55,61 @@ export type FlatMap<T = any, R = unknown> = Flatten<Map<T, R>>;
 export type Flatten<T extends Map> = Join<UnionToIntersection<T>>;
 
 // Merges all properties of an intersection type A & B
-export type Join<T> = T extends Obj ? { [K in keyof T]:  T[K] } : T;
+export type Join<T> = T extends Obj ? { [K in Keys<T>]:  T[K] } : T;
 
-export type Filter<T, V> =
-    T extends any[] ? FilterArray<T, V> :
-        T extends Obj ? FilterObj<T, V> :
+// TODO(@@dd): test this for T in any | unknown | never
+export type Filter<T, V, Condition extends boolean = true> =
+    T extends any[] ? FilterArray<T, V, Condition> :
+        T extends Obj ? FilterObj<T, V, Condition> :
             never;
 
-export type FilterNot<T, V> =
-    T extends any[] ? FilterNotArray<T, V> :
-        T extends Obj ? FilterNotObj<T, V> :
-            never;
+// TODO(@@dd): test if [K in keyof T] works for T in any | unknown | never
+type FilterObj<T, V, Condition extends boolean> = Pick<T, { [K in keyof T]-?: T[K] extends V
+    ? Condition extends true ? K : never
+    : Condition extends true ? never : K
+}[Keys<T>]>;
 
-type FilterObj<T, V> = Pick<T, { [K in keyof T]-?: T[K] extends V ? K : never }[keyof T]>;
-
-type FilterNotObj<T, V> = Pick<T, { [K in keyof T]-?: T[K] extends V ? never : K }[keyof T]>;
-
-type FilterArray<A extends any[], V> =
+type FilterArray<A extends any[], V, Condition extends boolean> =
     A extends [] ? [] :
         A extends [infer H, ...infer T]
             ? H extends V
-                ? [H, ...FilterArray<T, V>]
-                : FilterArray<T, V>
+                ? Condition extends true ? [H, ...FilterArray<T, V, Condition>] : FilterArray<T, V, Condition>
+                : Condition extends true ? FilterArray<T, V, Condition> : [H, ...FilterArray<T, V, Condition>]
             : [];
 
-type FilterNotArray<A extends any[], V> =
-    A extends [] ? [] :
-        A extends [infer H, ...infer T]
-            ? H extends V
-                ? FilterNotArray<T, V>
-                : [H, ...FilterNotArray<T, V>]
-            : [];
+// predicates
 
-export type Merge<S, T> =
-    Is<S, T> extends true ? S : // identity
-        Is<T, void> extends true ? S : // if target expects nothing it is ok to provide something
-            Or<Is<S, never>, Is<T, never>> extends true ? never :
-                Is<S, unknown> extends true ? unknown : Is<T, unknown> extends true ? S :
-                    Is<S, any> extends true ? any : Is<T, any> extends true ? S :
-                        S extends any[] ? (T extends any[] ? MergeArrays<S, T> : (S extends T ? S : never)) :
-                            S extends Fn ? (T extends Fn ? MergeFunctions<S, T> : (S extends T ? S : never)) :
-                                S extends Obj ? (T extends Obj ? MergeObjects<S, T> : (S extends T ? S : never)) :
-                                    S extends T ? S : never;
+// returns true if T1 is exactly T2
+export type Is<T1, T2> =
+    (<T>() => T extends T2 ? true : false) extends (<T>() => T extends T1 ? true : false)
+        ? true
+        : false;
 
-// Consumers of T expect a certain abount of elements.
-// It is required that S has at less or equal elements as T.
-// It is sufficient, if elements of S extend elements of T.
-type MergeArrays<S extends any[], T extends any[]> =
-    S extends [infer HeadS, ...infer TailS]
-        ? T extends [infer HeadT, ...infer TailT]
-            ? [Merge<HeadS, HeadT>, ...MergeArrays<TailS, TailT>]
-            : [never] // T = [], users which expect T don't provide more elements required by S
-        : []; // S = [], S ignores additions elements required by users of T
+export type Extends<A1, A2> =
+    Is<A1, never> extends true ? true :
+        Is<A2, never> extends true ? false :
+            Is<A2, any> extends true ? true :
+                Is<A2, unknown> extends true ? true :
+                    Is<A1, any> extends true ? false :
+                        Is<A1, unknown> extends true ? false :
+                            A1 extends A2 ? true : false;
 
-type MergeFunctions<S extends Fn, T extends Fn> =
-    S extends (...args: infer ArgsS) => infer ResS
-        ? T extends (...args: infer ArgsT) => infer ResT
-            ? Merge<ArgsS, ArgsT> extends infer A
-                ? A extends any[] ? (...args: A) => Merge<ResS, ResT> : never
-                : never
-            : never
-        : never;
+// logical and
+export type And<C1 extends boolean, C2 extends boolean> =
+    C1 extends true
+        ? C2 extends true
+            ? true
+            : false
+        : false;
 
-// TODO(@@dd): Workaround for infinite deep type error when calling Merge. Remove `export` and use Merge instead.
-export type MergeObjects<S, T> =
-    Flatten<{
-        [K in keyof S | keyof T]: K extends keyof S
-            ? (K extends keyof T ? Merge<S[K], T[K]> : S[K])
-            : (K extends keyof T ? T[K] : never)
-    }>;
+// logical or
+export type Or<C1 extends boolean, C2 extends boolean> =
+    C1 extends true
+        ? true
+        : C2 extends true
+            ? true
+            : false;
 
-// returns the property values of the first level
-export type Values<T> = T[keyof T];
+// logical not
+export type Not<C extends boolean> =
+    C extends true ? false : true;

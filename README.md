@@ -1,3 +1,5 @@
+# ⚠️ BEWARE! THE API IS STILL UNSTABLE AND WILL CHANGE!
+
 <div id="typelevel-logo" align="center">
   <a href="https://github.com/danieldietrich/typelevel">
     <img alt="TypeLevel Logo" width="450" src="https://user-images.githubusercontent.com/743833/196072540-36ba3965-2c6f-4746-967e-59598b2acdc8.png">
@@ -21,11 +23,15 @@
 <br/>
 <br/>
 
-<tt>**&lt;TypeLevel&gt;**</tt> pushes energy from the JavaScript runtime to the TypeScript compiler. The highly composable type level API not only feels like superpower, _the-real-code™_ is freed from unnecessary ballast.
+<tt>**&lt;TypeLevel>**</tt> pushes payload from the JavaScript runtime to the TypeScript compiler. The highly composable type level API gives us the superpower to free JS apps from unnecessary ballast.
+
+Ideally, types describe the domain, both structure and behavior. The latter is a challenge. There are not many major languages which are capable of describing behavior on the type level. TypeScript is different, it empowers us to perform algorithmic type transformations.
+
+TypeScript does not pretend anything how to use the types. This is where <tt>**&lt;TypeLevel>**</tt> comes into play. <tt>**&lt;TypeLevel>**</tt> is more than a toolkit of useful utility methods, it offers a **solution** that yields a **mental model** for **type level programming** in TypeScript.
 
 ## Usage
 
-Install <tt>**&lt;TypeLevel&gt;**</tt>
+Install <tt>**&lt;TypeLevel>**</tt>
 
 ```sh
 npm i -D typescript-typelevel
