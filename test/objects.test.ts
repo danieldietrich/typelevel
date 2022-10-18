@@ -11,9 +11,9 @@ import { Is, IsEmpty, Join, Keys, Paths, Values } from "../src";
 describe('IsEmpty<T>', () => {
 
     it('should work for universal types', () => {
-        assertType<Is<IsEmpty<any>, true>>();
-        assertType<Is<IsEmpty<unknown>, true>>();
-        assertType<Is<IsEmpty<never>, true>>();
+        assertType<Is<IsEmpty<any>, boolean>>();
+        assertType<Is<IsEmpty<unknown>, unknown>>();
+        assertType<Is<IsEmpty<never>, never>>();
         assertType<Is<IsEmpty<{}>, true>>();
     });
 

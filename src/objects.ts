@@ -9,8 +9,11 @@ import { UnionToIntersection } from "./utilities";
 export type Obj = Record<PropertyKey, unknown>;
 
 export type IsEmpty<T> =
-    [T] extends [[]] ? true :
-        [Keys<T>] extends [never] ? true : false;
+    Is<T, any> extends true ? boolean :
+        Is<T, unknown> extends true ? unknown :
+            Is<T, never> extends true ? never :
+                [T] extends [[]] ? true :
+                    [Keys<T>] extends [never] ? true : false;
 
 // returns a union of keys of T.
 // good alternative to keyof T if users want to get rid of special handling of T in any | never at the use-site.
