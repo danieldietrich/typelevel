@@ -25,7 +25,7 @@ export type Keys<T> =
  * Syntactic sugar for T[keyof T].
  * @returns T[keyof T], [any, unknown, never] => [any, never, never]
  */
-/xport type Values<T> = T[keyof T];
+export type Values<T> = T[keyof T];
 
 // deep-flattens the keys
 export type Paths<T, P = TupledPaths<T>> =
