@@ -54,7 +54,8 @@ import { UnionToIntersection } from "./utilities";
  *
  * See https://github.com/microsoft/TypeScript/issues/42825#issuecomment-780873604
  */
-export type Obj<Strict extends boolean = true> = Record<PropertyKey, (Strict extends true ? unknown : any)>;
+export type Obj<Strict extends boolean = true> =
+    Record<PropertyKey, (Strict extends true ? unknown : any)>;
 
 /**
  * Good alternative to keyof T if users want to get rid of special handling of
@@ -98,18 +99,18 @@ type _Paths<T, Strict extends boolean, P = TupledPaths<T, Strict>> =
             : never;
 
 // currently symbol keys are not supported
-type TupledPaths<T, Strict extends boolean = true, _K = Keys<T>> =
+type TupledPaths<T, Strict extends boolean = true, K = Keys<T>> =
     T extends Obj<Strict>
-        ? _K extends string | number
-            ? Or<Is<T[_K], any>, Is<T[_K], never>> extends true
-                ? [`${_K}`, T[_K]]
-                : T[_K] extends Record<string | number, unknown>
-                    ? TupledPaths<T[_K]> extends infer F
+        ? K extends string | number
+            ? Or<Is<T[K], any>, Is<T[K], never>> extends true
+                ? [`${K}`, T[K]]
+                : T[K] extends Record<string | number, unknown>
+                    ? TupledPaths<T[K]> extends infer F
                         ? F extends [string, unknown]
-                            ? [`${_K}.${F[0]}`, F[1]]
+                            ? [`${K}.${F[0]}`, F[1]]
                             : never
                         : never
-                    : [`${_K}`, T[_K]]
+                    : [`${K}`, T[K]]
             : never
         : never;
 
@@ -120,10 +121,12 @@ export type Filter<T, V, Condition extends boolean = true> =
             never;
 
 // TODO(@@dd): test if [K in keyof T] works for T in any | unknown | never
-type FilterObj<T, V, Condition extends boolean> = Pick<T, { [K in keyof T]-?: T[K] extends V
-    ? Condition extends true ? K : never
-    : Condition extends true ? never : K
-}[Keys<T>]>;
+type FilterObj<T, V, Condition extends boolean> =
+    Pick<T, {
+        [K in keyof T]-?: T[K] extends V
+            ? Condition extends true ? K : never
+            : Condition extends true ? never : K
+    }[Keys<T>]>;
 
 type FilterArray<A extends any[], V, Condition extends boolean> =
     A extends [] ? [] :
@@ -135,14 +138,18 @@ type FilterArray<A extends any[], V, Condition extends boolean> =
 
 // Map preserves union results
 // TODO(@@dd): Map<T = any, R = unknown> = [unknown] extends [T] ? unknown : R;
-export type Map<T = any, R = unknown> = [unknown] extends [T] ? unknown : R;
+export type Map<T = any, R = unknown> =
+    [unknown] extends [T] ? unknown : R;
 
 // FlatMap distributes a union and flattens the result
-export type FlatMap<T = any, R = unknown> = Flatten<Map<T, R>>;
+export type FlatMap<T = any, R = unknown> =
+    Flatten<Map<T, R>>;
 
 // Flattens union types
 // TODO(@@dd): compare this with other semantics, like https://catchts.com/flatten-union
-export type Flatten<T extends Map> = Join<UnionToIntersection<T>>;
+export type Flatten<T extends Map> =
+    Join<UnionToIntersection<T>>;
 
 // Merges all properties of an intersection type A & B
-export type Join<T> = T extends Obj ? { [K in Keys<T>]:  T[K] } : T;
+export type Join<T, Strict extends boolean = true> =
+    T extends Obj<Strict> ? { [K in Keys<T>]:  T[K] } : T;
