@@ -6,6 +6,6 @@
 
 export * from './functions';
 export * from './objects';
-export * from './predicates'
+export * from './predicates';
 export * from './type-checker';
 export * from './utilities';

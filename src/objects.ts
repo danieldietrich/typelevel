@@ -8,24 +8,27 @@ import { Is, Or } from "./predicates";
 import { UnionToIntersection } from "./utilities";
 
 /**
- * Syntactic sugar for Record<PropertyKey, unknown> and Record<PropertyKey, any>,
- * which represent a type with a set of properties.
+ * Obj represents a type with a set of properties. Obj is syntactic sugar for
+ * Record<PropertyKey, unknown> (Strict = true) and
+ * Record<PropertyKey, any> (Strict = false).
  *
- * By default Obj strictly represents objects, i.e. it does not include classes,
- * arrays, functions and primitives.
+ * By default Obj strictly represents objects and does not include classes,
+ * arrays, functions and primitives. We introduce the concept of strictness
+ * to allow for more flexible representations of objects. Idiomatic types
+ * that act on objects have a Strict parameter that is delegated to Obj.
  *
  * Obj = Obj<true> = Record<PropertyKey, unknown> does not match interfaces or
  * classes (but the empty class A {}) because they are possible target for
  * declaration merging, their properties are not fully known.
  *
- * Obj<false> = Record<PropertyKey, any> matches all structures (with and without
- * inferrable index signature). Caution: class and array types are matched by
- * Obj<false> but also primitive types!
+ * Obj<false> = Record<PropertyKey, any> = object matches all structures, with
+ * and without inferrable index signature.
  *
  * Let EmptyClass = class A {} and NonEmptyClass = class A { a: number }.
  * Let IsObj<T, Strict extends boolean> = T extends Obj<Strict> ? true : false.
+ * Then the following holds:
  *
- * |  T               | IsObj<T, true> | IsObj<T, false> |
+ * |  T               | IsObj<T>       | IsObj<T, false> |
  * | ---------------- | -------------- | --------------- |
  * | any              | boolean        | boolean         |
  * | unknown          | false          | false           |

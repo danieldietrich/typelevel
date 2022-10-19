@@ -20,7 +20,7 @@ import { Is, IsEmpty, Join, Keys, Paths, Values } from "../src";
     assertType<Is<Actual, Expected>>();
 }
 
-{ // Keys<T> should fix keyof any = string | number | symbol
+{ // Keys<T>should fix keyof any = string | number | symbol
     type Actual = Keys<any>;
     type Expected = never
     assertType<Is<keyof any, string | number | symbol>>();
