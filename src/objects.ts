@@ -150,6 +150,17 @@ export type FlatMap<T = any, R = unknown> =
 export type Flatten<T extends Map> =
     Join<UnionToIntersection<T>>;
 
-// Merges all properties of an intersection type A & B
+/**
+ * Merges all properties of an intersection type A & B if T extends Obj<Strict>.
+ * This type does not differ from the built-in type "A & B" in any way,
+ * except for the Strict mode.
+ *
+ * A use case of Join is to flatten an intersection type of objects for display
+ * purposes.
+ *
+ * @param T a non-empty union of intersections
+ * @param Strict only objects of type Obj<Strict> are merged
+ * @returns a non-empty union of objects
+ */
 export type Join<T, Strict extends boolean = true> =
     T extends Obj<Strict> ? { [K in Keys<T>]:  T[K] } : T;

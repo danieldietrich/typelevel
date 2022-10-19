@@ -44,7 +44,18 @@ export type Is<T1, T2> =
  * • Is<U_1, T> or Is<U_2, T> if Strict = true
  * • Extends<U_1, T> or Extends<U_2, T> if Strict = false
  *
- * @param T the type to check
+ * Example use cases:
+ *
+ * • IsIn<T, U_1 | U_2 | U_3> is equivalent to
+ *   Or<Extends<U_1, T>, Or<Extends<U_2, T>, Extends<U_3, T>>>
+ * • IsIn<T, U_1 | U_2 | U_3, true> is equivalent to
+ *   Or<Is<U_1, T>, Or<Is<U_2, T>, Is<U_3, T>>>
+ * • Does not work for universal types, e.g.
+ *   IsIn<T, any | unknown | never, true> fails and
+ *   IsIn<any | unknown | never, T, true> fails.
+ *   See IsUniveral<T> for a predicate that checks for universal types.
+ *
+ * @param T a non-empty union type
  * @param U the union to check against
  * @returns true if any element of the union U contains T
  */
@@ -67,7 +78,14 @@ type Exists<T, U extends any[], Strict extends boolean> =
  * • Is<U_1, T> and Is<U_2, T> if Strict = true
  * • Extends<U_1, T> and Extends<U_2, T> if Strict = false
  *
- * @param T the type to check
+ * Example use cases:
+ *
+ * • IsIn<T, U_1 | U_2 | U_3> is equivalent to
+ *   And<Extends<U_1, T>, And<Extends<U_2, T>, Extends<U_3, T>>>
+ * • IsIn<T, U_1 | U_2 | U_3, true> is equivalent to
+ *   And<Is<U_1, T>, And<Is<U_2, T>, Is<U_3, T>>>
+ *
+ * @param T a non-empty union type
  * @param U the union to check against
  * @returns true if all elements of the union U contain T
  */
