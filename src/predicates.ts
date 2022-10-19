@@ -8,19 +8,11 @@ import { UnionToTuple } from "./utilities";
 
 // logical and
 export type And<C1 extends boolean, C2 extends boolean> =
-    C1 extends true
-        ? C2 extends true
-            ? true
-            : false
-        : false;
+    C1 extends true ? C2 : false;
 
 // logical or
 export type Or<C1 extends boolean, C2 extends boolean> =
-    C1 extends true
-        ? true
-        : C2 extends true
-            ? true
-            : false;
+    C1 extends true ? true : C2;
 
 // logical not
 export type Not<C extends boolean> =
@@ -64,7 +56,7 @@ export type IsIn<T, U, Strict extends boolean = false> =
 
 type Exists<T, U extends any[], Strict extends boolean> =
     U extends [infer Head, ...infer Tail]
-        ? (Strict extends true ? Is<Head, T> : Extends<Head, T>) extends true ? true : Exists<T, Tail, Strict>
+        ? Strict extends true ? Is<Head, T> : Extends<Head, T> extends true ? true : Exists<T, Tail, Strict>
         : false;
 
 /**
@@ -94,18 +86,18 @@ export type IsEach<T, U, Strict extends boolean = false> =
 
 type AllOf<T, U extends any[], Strict extends boolean> =
     U extends [infer Head, ...infer Tail]
-        ? (Strict extends true ? Is<Head, T> : Extends<Head, T>) extends true ? AllOf<T, Tail, Strict> : false
+        ? Strict extends true ? Is<Head, T> : Extends<Head, T> extends true ? AllOf<T, Tail, Strict> : false
         : true;
 
 export type IsEmpty<T> =
     Is<T, any> extends true ? boolean :
         Is<T, unknown> extends true ? unknown :
             Is<T, never> extends true ? never :
-                [T] extends [[]] ? true :
-                    [(/* copy of objects/Keys */Or<Is<T, any>, Is<T, never>> extends true ? never : keyof T)] extends [never] ? true : false;
+                Is<T, []> extends true ? true :
+                    Is<(/* copy of objects/Keys */IsUniversal<T> extends true ? never : keyof T), never>;
 
 export type IsUniversal<T> =
-    Or<Is<T, any>, Or<Is<T, unknown>, Is<T, never>>> extends true ? true : false;
+    Or<Is<T, any>, Or<Is<T, unknown>, Is<T, never>>>;
 
 export type Extends<A1, A2> =
     Is<A1, never> extends true ? true :

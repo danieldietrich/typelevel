@@ -4,7 +4,7 @@
  * terms of the MIT License, which is available in the project root.
  ******************************************************************************/
 
-import { Is, Or } from "./predicates";
+import { Is, IsUniversal, Or } from "./predicates";
 import { UnionToIntersection } from "./utilities";
 
 /**
@@ -65,7 +65,7 @@ export type Obj<Strict extends boolean = true> =
  * @returns keyof T, any/unknown/never => never
  */
 export type Keys<T> =
-    Or<Is<T, any>, Is<T, never>> extends true ? never : keyof T;
+    IsUniversal<T> extends true ? never : keyof T;
 
 /**
  * Syntactic sugar for T[keyof T].
@@ -91,7 +91,6 @@ export type Paths<T, Strict extends boolean = true> = _Paths<T, Strict>;
 
 // don't expose calculated parameter P as public API
 type _Paths<T, Strict extends boolean, P = TupledPaths<T, Strict>> =
-    // TODO(@@dd): write `Exists<any | unknown | never | {}, T> extends true` instead
     Or<Is<T, {}>, Or<Is<T, any>, Or<Is<T, unknown>, Is<T, never>>>> extends true
         ? T
         : P extends [string, unknown]
