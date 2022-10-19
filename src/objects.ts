@@ -86,12 +86,15 @@ export type Values<T> = T[keyof T];
  * @param T a type
  * @returns a flattened object. any/unknown/never => any/unknown/never
  */
-export type Paths<T, Strict extends boolean = true, _P = TupledPaths<T, Strict>> =
+export type Paths<T, Strict extends boolean = true> = _Paths<T, Strict>;
+
+// don't expose calculated parameter P as public API
+type _Paths<T, Strict extends boolean, P = TupledPaths<T, Strict>> =
     // TODO(@@dd): write `Exists<any | unknown | never | {}, T> extends true` instead
     Or<Is<T, {}>, Or<Is<T, any>, Or<Is<T, unknown>, Is<T, never>>>> extends true
         ? T
-        : _P extends [string, unknown]
-            ? { [K in `${_P[0]}`]: _P[1] }
+        : P extends [string, unknown]
+            ? { [K in `${P[0]}`]: P[1] }
             : never;
 
 // currently symbol keys are not supported
