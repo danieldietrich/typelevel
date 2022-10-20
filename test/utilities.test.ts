@@ -5,10 +5,9 @@
  ******************************************************************************/
 
 import { assertType } from 'typelevel-assert';
-import { describe, it } from 'vitest'
 import { Extends, Fn, Is, Obj } from '../src';
 
-describe('type Extends', () => {
+{ // Extends
 
     const emptyObj = {};
 
@@ -22,7 +21,7 @@ describe('type Extends', () => {
         a = 1;
     }
 
-    it('should recognize the identity', () => {
+    { // Extends should recognize the identity
         assertType<Is<Extends<any, any>, true>>();
         assertType<Is<Extends<never, never>, true>>();
         assertType<Is<Extends<unknown, unknown>, true>>();
@@ -37,54 +36,54 @@ describe('type Extends', () => {
         assertType<Is<Extends<Fn, Fn>, true>>();
         assertType<Is<Extends<Obj, Obj>, true>>();
         assertType<Is<Extends<A, A>, true>>();
-    });
+    }
 
-    it('should recognize that never extends everything', () => {
+    { // Extends should recognize that never extends everything
         assertType<Is<Extends<never, never>, true>>();
         assertType<Is<Extends<never, any>, true>>();
         assertType<Is<Extends<never, unknown>, true>>();
         assertType<Is<Extends<never, 1>, true>>();
-    });
+    }
 
-    it('should recognize that nothing but itself extends never', () => {
+    { // Extends should recognize that nothing but itself extends never
         assertType<Is<Extends<never, never>, true>>();
         assertType<Is<Extends<any, never>, false>>();
         assertType<Is<Extends<unknown, never>, false>>();
         assertType<Is<Extends<1, never>, false>>();
-    });
+    }
 
-    it('should recognize that any extends nothing but itself and unknown', () => {
+    { // Extends should recognize that any extends nothing but itself and unknown
         assertType<Is<Extends<any, any>, true>>();
         assertType<Is<Extends<any, never>, false>>();
         assertType<Is<Extends<any, unknown>, true>>();
         assertType<Is<Extends<any, 1>, false>>();
-    });
+    }
 
-    it('should recognize that unknown extends nothing but itself and any', () => {
+    { // Extends should recognize that unknown extends nothing but itself and any
         assertType<Is<Extends<unknown, unknown>, true>>();
         assertType<Is<Extends<unknown, never>, false>>();
         assertType<Is<Extends<unknown, any>, true>>();
         assertType<Is<Extends<unknown, 1>, false>>();
-    });
+    }
 
-    it('should recognize that everything extends any', () => {
+    { // Extends should recognize that everything extends any
         assertType<Is<Extends<never, any>, true>>();
         assertType<Is<Extends<unknown, any>, true>>();
         assertType<Is<Extends<1, any>, true>>();
-    });
+    }
 
-    it('should recognize that everything extends unknown', () => {
+    { // Extends should recognize that everything extends unknown
         assertType<Is<Extends<any, unknown>, true>>();
         assertType<Is<Extends<never, unknown>, true>>();
         assertType<Is<Extends<1, unknown>, true>>();
-    });
+    }
 
-    it('should work for numbers', () => {
+    { // Extends should work for numbers
         assertType<Is<Extends<1, number>, true>>();
         assertType<Is<Extends<number, 1>, false>>();
-    });
+    }
 
-    it('should work for functions', () => {
+    { // Extends should work for functions
         assertType<Is<Extends<() => any, Fn>, true>>();
         assertType<Is<Extends<() => void, Fn>, true>>();
         assertType<Is<Extends<(...args: any[]) => any, Fn>, true>>();
@@ -100,9 +99,9 @@ describe('type Extends', () => {
         assertType<Is<Extends<any[], Fn>, false>>();
         assertType<Is<Extends<Record<string, unknown>, Fn>, false>>();
         assertType<Is<Extends<A, Fn>, false>>();
-    });
+    }
 
-    it('should work for arrays', () => {
+    { // Extends should work for arrays
         assertType<Is<Extends<any[], any[]>, true>>();
         assertType<Is<Extends<[], []>, true>>();
         assertType<Is<Extends<any[], []>, false>>();
@@ -122,9 +121,9 @@ describe('type Extends', () => {
         assertType<Is<Extends<[number, string], [1, ""]>, false>>();
         assertType<Is<Extends<[number, any], [1, ""]>, false>>();
         assertType<Is<Extends<[number, never], [1, ""]>, false>>();
-    });
+    }
 
-    it('should work for objects', () => {
+    { // Extends should work for objects
         assertType<Is<Extends<A, EmptyObj>, true>>();
         assertType<Is<Extends<EmptyObj, A>, false>>();
 
@@ -138,6 +137,6 @@ describe('type Extends', () => {
         assertType<Is<Extends<{ a: 1 }, EmptyObj>, true>>();
         assertType<Is<Extends<{ a: 1 }, { a: number }>, true>>();
         assertType<Is<Extends<{ a: 1 }, { a: string }>, false>>();
-    });
+    }
 
-});
+}

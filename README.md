@@ -15,7 +15,7 @@
 <div id="badges" align="center">
 
 [![npm version](https://img.shields.io/npm/v/typescript-typelevel?logo=npm&style=flat-square)](https://www.npmjs.com/package/typescript-typelevel/)
-[![build](https://img.shields.io/github/workflow/status/danieldietrich/typelevel/Test/main?logo=github&style=flat-square)](https://github.com/danieldietrich/typelevel/actions/workflows/test.yml)
+[![build](https://img.shields.io/github/workflow/status/danieldietrich/typelevel/Build/main?logo=github&style=flat-square)](https://github.com/danieldietrich/typelevel/actions/workflows/build.yml)
 [![Gitpod ready-to-code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod&style=flat-square)](https://gitpod.io/#https://github.com/danieldietrich/typelevel)
 
 </div>
