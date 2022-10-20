@@ -4,8 +4,14 @@
  * terms of the MIT License, which is available in the project root.
  ******************************************************************************/
 
-// a function
+/**
+ * Represents a function type with a variable number of arguments and a return type.
+ *
+ * Examples:
+ * • A function with exactly one parameter: Fn<[infer First], infer R>
+ * • A function with one or more parameters: Fn<[infer First, ...infer Rest], infer R>
+ *
+ * @param A - the argument types
+ * @param R - the return type
+ */
 export type Fn<T extends any[] = any[], R extends any = any> = (...args: T) => R;
-
-// a function with exactly one argument
-export type Fn1<T = any, R = any> = (args0: T, ...args: any[]) => R;
