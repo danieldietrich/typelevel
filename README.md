@@ -2,7 +2,9 @@
 
 <div id="typelevel-logo" align="center">
   <a href="https://github.com/danieldietrich/typelevel">
-    <img alt="TypeLevel Logo" width="450" src="https://user-images.githubusercontent.com/743833/196072540-36ba3965-2c6f-4746-967e-59598b2acdc8.png">
+    <img alt="TypeLevel Logo Dark Mode" width="450" src="https://user-images.githubusercontent.com/743833/196877383-1c37e558-e699-4ab7-96be-3e1de418a2d1.png#gh-dark-mode-only">
+  <a href="https://github.com/danieldietrich/typelevel">
+    <img alt="TypeLevel Logo Light Mode" width="450" src="https://user-images.githubusercontent.com/743833/196877381-77ec5c97-3f1f-4b86-a4ef-7f7bdc5536ee.png#gh-light-mode-only">
   </a>
   <h3>
     Lift your code to the next level.
