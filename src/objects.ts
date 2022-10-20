@@ -113,11 +113,24 @@ type TupledPaths<T, Strict extends boolean = true, K = Keys<T>> =
             : never
         : never;
 
+// Default if T is undefined, otherwise T
+export type Default<T, Default> = Is<T, undefined> extends true ? ([Default] extends [Default] ? true : false) : T;
+
 // TODO(@@dd): test this for T in any | unknown | never
-export type Filter<T, V, Condition extends boolean = true> =
-    T extends any[] ? FilterArray<T, V, Condition> :
-        T extends Obj ? FilterObj<T, V, Condition> :
+export type Filter<T, V, Options extends FilterOptions = {
+    condition: false
+}> =
+    T extends any[] ? FilterArray<T, V, Default<Options['condition'], true>> :
+        T extends Obj<Default<Options['strict'], true>> ? FilterObj<T, V, Default<Options['condition'], true>> :
             never;
+
+export type FilterOptions = {
+    condition?: boolean;
+    relation?: 'extends' | 'super' | 'is';
+    strict?: boolean;
+}
+
+type O = undefined | number;
 
 // TODO(@@dd): test if [K in keyof T] works for T in any | unknown | never
 type FilterObj<T, V, Condition extends boolean> =
