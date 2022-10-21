@@ -7,7 +7,7 @@
 import { assertType } from "typelevel-assert";
 import { Combine, Is, Keys, Obj, Paths, Values } from "../src";
 
-{ // Obj<Strict = true>
+{ // Obj
 
     interface EmptyInterface {}
     interface NonEmptyInterface { a: number }
@@ -37,63 +37,63 @@ import { Combine, Is, Keys, Obj, Paths, Values } from "../src";
     assertType<Is<void extends Obj ? true : false, false>>();
 }
 
-{ // Keys<T>should fix keyof any = string | number | symbol
+{ // Keys<any> should behave like keyof any
     type Actual = Keys<any>;
-    type Expected = never
-    assertType<Is<keyof any, string | number | symbol>>();
+    type Expected = string | number | symbol
+    assertType<Is<keyof any, Expected>>();
     assertType<Is<Actual, Expected>>();
 }
 
-{ // Keys<T> should behave like keyof unknown = never
+{ // Keys<unknown> should behave like keyof unknown
     type Actual = Keys<unknown>;
     type Expected = never;
-    assertType<Is<Actual, keyof unknown>>();
+    assertType<Is<keyof unknown, Expected>>();
     assertType<Is<Actual, Expected>>();
 }
 
-{ // Keys<T> should fix keyof never = string | number | symbol
+{ // Keys<never> should behave like keyof never
     type Actual = Keys<never>;
-    type Expected = never
-    assertType<Is<keyof never, string | number | symbol>>();
+    type Expected = string | number | symbol
+    assertType<Is<keyof never, Expected>>();
     assertType<Is<Actual, Expected>>();
 }
 
-{ // Values<T> should behave like any[keyof any] = any
+{ // Values<any> should behave like any[keyof any]
     type Actual = Values<any>;
     type Expected = any;
-    assertType<Is<Actual, any[keyof any]>>();
+    assertType<Is<any[keyof any], Expected>>();
     assertType<Is<Actual, Expected>>();
 }
 
-{ // Values<T> should behave like unknown[keyof unknown] = never
+{ // Values<unknown> should behave like unknown[keyof unknown]
     type Actual = Values<unknown>;
     type Expected = never;
-    assertType<Is<Actual, unknown[keyof unknown]>>();
+    assertType<Is<unknown[keyof unknown], Expected>>();
     assertType<Is<Actual, Expected>>();
 }
 
-{ // Values<T> should behave like never[keyof never] = never
+{ // Values<never> should behave like never[keyof never]
     type Actual = Values<never>;
     type Expected = never
-    assertType<Is<Actual, never[keyof never]>>();
+    assertType<Is<never[keyof never], Expected>>();
     assertType<Is<Actual, Expected>>();
 }
 
-{ // Join should join universal types
-    assertType<Is<Combine<any>, any>>();
-    assertType<Is<Combine<unknown>, unknown>>();
+{ // Combine should join universal types
+    assertType<Is<Combine<any>, { [x in (string | number | symbol)]: any }>>();
+    assertType<Is<Combine<unknown>, {}>>();
     assertType<Is<Combine<never>, never>>();
     assertType<Is<Combine<{}>, {}>>();
 }
 
-{ // Join should fulfil prerequisite Is<{ a: 1 } & { b: 2 }, { a: 1, b: 2 }> extends false
+{ // Combine should fulfil prerequisite Is<{ a: 1 } & { b: 2 }, { a: 1, b: 2 }> extends false
     type Actual = { a: 1 } & { b: 2 };
     type Expected = { a: 1, b: 2 };
     // @ts-expect-error
     assertType<Is<Actual, Expected>>();
 }
 
-{ // Join should join intersection
+{ // Combine should join intersection
     type Actual = Combine<{ a: 1 } & { b: 2 }>;
     type Expected = { a: 1, b: 2 };
     assertType<Is<Actual, Expected>>();

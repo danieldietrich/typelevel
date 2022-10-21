@@ -7,6 +7,18 @@
 import { Is, IsUniversal, Or } from "./predicates";
 
 /**
+ * Combines all properties of an intersection type T = A & B if T extends Obj.
+ * This type does not differ from the built-in type "A & B" in any way.
+ *
+ * A use case of Combine is to flatten an intersection type of objects for
+ * display purposes.
+ *
+ * @param T a non-empty union of intersections
+ * @returns a non-empty union of objects
+ */
+export type Combine<T> = { [K in (keyof T)]: T[K] };
+
+/**
  * Obj represents a type with a set of properties. Obj is syntactic sugar for
  * Record<PropertyKey, unknown>, while the TS build-it object has the form
  * Record<PropertyKey, any>.
@@ -44,32 +56,18 @@ import { Is, IsUniversal, Or } from "./predicates";
 export type Obj = Record<PropertyKey, unknown>;
 
 /**
- * Combines all properties of an intersection type A & B if T extends Obj<Strict>.
- * This type does not differ from the built-in type "A & B" in any way,
- * except for the Strict mode.
+ * Convenience type alias for keyof T, with a fix for one common mistake:
  *
- * A use case of Join is to flatten an intersection type of objects for display
- * purposes.
- *
- * @param T a non-empty union of intersections
- * @returns a non-empty union of objects
- */
-export type Combine<T> =
-    T extends Obj
-        ? { [K in Keys<T>]:  T[K] }
-        : T;
-
-/**
- * Good alternative to keyof T for getting rid of special handling of
- * universal types any/unknown/never at the use-site.
+ *    { [x in keyof any]: any }
+ *  = { [x: string]: any }
+ * != { [x: string]: any; [x: number]: any; [x: symbol]: never }
+ *  = { [_ in (keyof any)]: any }
+ *  = { [_ in Keys<T>]: any }
  *
  * @param T a type
- * @returns keyof T, any/unknown/never => never
+ * @returns keyof T
  */
-export type Keys<T> =
-    IsUniversal<T> extends true
-        ? never
-        : keyof T;
+export type Keys<T> = keyof T;
 
 /**
  * Syntactic sugar for T[keyof T].
@@ -102,7 +100,7 @@ type _Paths<T, P = TupledPaths<T>> =
             : never;
 
 // currently symbol keys are not supported
-type TupledPaths<T, K = Keys<T>> =
+type TupledPaths<T, K = keyof T> =
     T extends Obj
         ? K extends string | number
             ? IsUniversal<T[K]> extends true
@@ -131,7 +129,7 @@ type FilterObj<T, V, C extends boolean> =
         [K in keyof T]-?: T[K] extends V
             ? C extends true ? K : never
             : C extends true ? never : K
-    }[Keys<T>]>;
+    }[keyof T]>;
 
 type FilterArray<A, V, C extends boolean> =
     A extends [] ? [] :

@@ -110,7 +110,7 @@ import { Extends, Fn, Is, IsEmpty, IsIn, Obj } from "../src";
         assertType<Is<Extends<any, any>, true>>();
         assertType<Is<Extends<any, never>, false>>();
         assertType<Is<Extends<any, unknown>, true>>();
-        assertType<Is<Extends<any, 1>, false>>();
+        assertType<Is<Extends<any, 1>, true>>(); // <-- [any] extends [1] -> true, any extends 1 -> boolean
     }
 
     { // Extends should recognize that unknown extends nothing but itself and any
@@ -191,6 +191,12 @@ import { Extends, Fn, Is, IsEmpty, IsIn, Obj } from "../src";
         assertType<Is<Extends<{ a: 1 }, EmptyObj>, true>>();
         assertType<Is<Extends<{ a: 1 }, { a: number }>, true>>();
         assertType<Is<Extends<{ a: 1 }, { a: string }>, false>>();
+    }
+
+    { // Extends should not distribute
+        type Actual = Extends<never, { a: 1 } | { b: 1 }>; // would be never, if Extends distributed unions
+        type Expected = never extends { a: 1 } | { b: 1 } ? true : false; // = true
+        assertType<Is<Actual, Expected>>();
     }
 
 }
