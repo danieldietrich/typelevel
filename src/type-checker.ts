@@ -6,6 +6,7 @@
 
 import { Filter } from "./objects";
 
+// ✅
 export type CheckResult<A, V extends (A | CheckError)[], K extends PropertyKey = 'typelevel_error'> =
     Filter<V, CheckError> extends infer E
         ? E extends []
@@ -13,6 +14,7 @@ export type CheckResult<A, V extends (A | CheckError)[], K extends PropertyKey =
             : { [Key in K]: E }
         : never;
 
+// ✅
 export type CheckError<Message extends string = any, Cause = any, Help extends string = any> = {
     message: Message;
     cause: Cause;

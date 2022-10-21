@@ -4,21 +4,20 @@
  * terms of the MIT License, which is available in the project root.
  ******************************************************************************/
 
-import { Is, IsUniversal, Or } from "./predicates";
+import { IsUniversal } from "./predicates";
 
-/**
- * Combines all properties of an intersection type T = A & B if T extends Obj.
- * This type does not differ from the built-in type "A & B" in any way.
+/** ✅
+ * Combines all properties of an intersection type A & B.
+ * Combine does not differ from the built-in type A & B.
  *
- * A use case of Combine is to flatten an intersection type of objects for
- * display purposes.
+ * Combine distributes union types.
  *
- * @param T a non-empty union of intersections
- * @returns a non-empty union of objects
+ * @param T a union of intersections
+ * @returns a union of combined types
  */
 export type Combine<T> = { [K in (keyof T)]: T[K] };
 
-/**
+/** ✅
  * Obj represents a type with a set of properties. Obj is syntactic sugar for
  * Record<PropertyKey, unknown>, while the TS build-it object has the form
  * Record<PropertyKey, any>.
@@ -55,7 +54,7 @@ export type Combine<T> = { [K in (keyof T)]: T[K] };
  */
 export type Obj = Record<PropertyKey, unknown>;
 
-/**
+/** ✅
  * Convenience type alias for keyof T, with a fix for one common mistake:
  *
  *    { [x in keyof any]: any }
@@ -64,56 +63,67 @@ export type Obj = Record<PropertyKey, unknown>;
  *  = { [_ in (keyof any)]: any }
  *  = { [_ in Keys<T>]: any }
  *
+ * Keys does not distribute union types.
+ *
  * @param T a type
  * @returns keyof T
  */
 export type Keys<T> = keyof T;
 
-/**
+/** ✅
  * Syntactic sugar for T[keyof T].
  *
+ * Values does not distribute union types.
+ *
  * @param T a type
- * @returns T[keyof T], any/unknown/never => any/never/never
+ * @returns T[keyof T], where Values<any> = any, Values<unknown> = Values<never> = never
  */
 export type Values<T> = T[keyof T];
 
-/**
- * Deep-flattens object keys by recursively traversing the object structure
- * and concatenating all keys with '.'.
+/** ✅
+ * Deep-flattens object keys by recursively traversing the type structure and
+ * concatenating all keys with dot '.'.
  *
  * { a: { b: { c: number } } } => { 'a.b.c': number }
  *
- * Paths intentionally only traverses objects defined by the type Obj.
- * Interfaces, classes and arrays are not traversed.
+ * Paths intentionally only traverses types of shape Obj = Record<PropertyKey, unknown>.
+ * Interfaces, classes and arrays are seen as leafs. Currently Paths uses
+ * string literal types under the hood to concatenate keys. This is why only
+ * keys in string | number are supported, symbols are ignored.
  *
- * @param T a type
- * @returns a flattened object. any/unknown/never => any/unknown/never
+ * |  T                  | Paths<T>                 |
+ * | =================== | ======================== |
+ * | any                 | { [x: string]: any }     |
+ * | unknown             | never                    |
+ * | never               | never                    |
+ * | ------------------- | ------------------------ |
+ * | {}                  | {}                       |
+ * | { a: { b: 1 } }     | { 'a.b': 1 }             |
+ * | { a: 1 } | { b: 2 } | { 'a': 1 } | { 'b': 2 }  |
+ * | ------------------- | ------------------------ |
+ * | <arrays>            | never                    |
+ * | <classes>           | never                    |
+ * | <interfaces>        | never                    |
+ * | <functions>         | never                    |
+ * | <other-types>       | never                    |
+ *
+ * Paths distributes union types.
+ *
+ * @param T a union type
+ * @returns a union of flattened objects
  */
-export type Paths<T> = _Paths<T>;
-
-// don't expose calculated parameter P as public API
-type _Paths<T, P = TupledPaths<T>> =
-    Or<Is<T, {}>, IsUniversal<T>> extends true
-        ? T
-        : P extends [string, unknown]
-            ? { [K in `${P[0]}`]: P[1] }
+export type Paths<T> =
+        T extends Obj
+            ? { [K in `${TupledPaths<T>[0]}`]: TupledPaths<T>[1] }
             : never;
 
 // currently symbol keys are not supported
-type TupledPaths<T, K = keyof T> =
-    T extends Obj
-        ? K extends string | number
-            ? IsUniversal<T[K]> extends true
-                ? [`${K}`, T[K]]
-                : T[K] extends Obj
-                    ? TupledPaths<T[K]> extends infer F
-                        ? F extends [string, unknown]
-                            ? [`${K}.${F[0]}`, F[1]]
-                            : never
-                        : never
-                    : [`${K}`, T[K]]
-            : never
-        : never;
+type TupledPaths<T extends Obj, K extends string | number = Exclude<keyof T, symbol>, V = T[K]> =
+            IsUniversal<V> extends true
+                ? [`${K}`, V]
+                : V extends Obj
+                    ? [`${K}.${TupledPaths<V>[0]}`, TupledPaths<V>[1]]
+                    : [`${K}`, V];
 
 // TODO(@@dd): test this for T in any | unknown | never
 // C = Condition

@@ -48,24 +48,38 @@ import { Extends, Fn, Is, IsEmpty, IsIn, IsUniversal, Obj } from "../src";
 
 }
 
-{ // IsEmpty<T> should work for universal types
-    assertType<Is<IsEmpty<any>, boolean>>();
-    assertType<Is<IsEmpty<unknown>, unknown>>();
-    assertType<Is<IsEmpty<never>, never>>();
-    assertType<Is<IsEmpty<{}>, true>>();
+{ // IsEmpty
+
+    { // IsEmpty<T> should work for universal types
+        assertType<Is<IsEmpty<any>, boolean>>();
+        assertType<Is<IsEmpty<unknown>, unknown>>();
+        assertType<Is<IsEmpty<never>, never>>();
+        assertType<Is<IsEmpty<{}>, true>>();
+    }
+
+    { // IsEmpty<T> should work for non-empty object
+        type Actual = IsEmpty<{ a: 1 }>;
+        type Expected = false;
+        assertType<Is<Actual, Expected>>();
+    }
+
 }
 
-{ // IsEmpty<T> should work non-empty object
-    type Actual = IsEmpty<{ a: 1 }>;
-    type Expected = false;
-    assertType<Is<Actual, Expected>>();
-}
+{ // IsUniversal
 
-{ // IsUniversal<T>
-    assertType<Is<IsUniversal<any>, true>>();
-    assertType<Is<IsUniversal<unknown>, true>>();
-    assertType<Is<IsUniversal<never>, true>>();
-    assertType<Is<IsUniversal<1>, false>>();
+    { // IsUniversal<T>
+        assertType<Is<IsUniversal<any>, true>>();
+        assertType<Is<IsUniversal<unknown>, true>>();
+        assertType<Is<IsUniversal<never>, true>>();
+        assertType<Is<IsUniversal<1>, false>>();
+    }
+
+    { // IsUniversal should not distribute union types
+        type Actual = IsUniversal<number| any>;
+        type Expected = true; // instead of boolean = false | true
+        assertType<Is<Actual, Expected>>();
+    }
+
 }
 
 { // Extends

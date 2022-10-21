@@ -6,11 +6,7 @@
 
 import { UnionToTuple } from "./utilities";
 
-/**
- * Logical and.
- *
- * @param C1
- */
+// logical and
 export type And<C1 extends boolean, C2 extends boolean> =
     C1 extends true ? C2 : false;
 
@@ -22,7 +18,7 @@ export type Or<C1 extends boolean, C2 extends boolean> =
 export type Not<C extends boolean> =
     C extends true ? false : true;
 
-/**
+/** ✅
  * Syntactic sugar for A1 extends A2 ? true : false.
  *
  * Extends does not distribute union types, i.e. Extends<A, never> = true.
@@ -42,7 +38,7 @@ export type Is<T1, T2> =
         ? true
         : false;
 
-/**
+/** TODO(@@dd): remove Strict
  * Checks if (all properties of) T exists in _any_ element of the union
  * U = U_1 | ... | U_n, for n >= 0.
  * If Strict = true, then Is<U_k, T> is used for comparison, by default
@@ -77,7 +73,7 @@ type Exists<T, U extends any[], Strict extends boolean> =
         ? Strict extends true ? Is<Head, T> : Extends<Head, T> extends true ? true : Exists<T, Tail, Strict>
         : false;
 
-/**
+/** TODO(@@dd): remove Strict
  * Checks if (all properties of) T exists in _all_ elements of the union
  * U = U_1 | ... | U_n, for n >= 0.
  * If Strict = true, then Is<U_k, T> is used for comparison, by default
@@ -107,6 +103,7 @@ type AllOf<T, U extends any[], Strict extends boolean> =
         ? Strict extends true ? Is<Head, T> : Extends<Head, T> extends true ? AllOf<T, Tail, Strict> : false
         : true;
 
+// TODO(@@dd): remove special handling of any | unknown | never
 export type IsEmpty<T> =
     Is<T, any> extends true ? boolean :
         Is<T, unknown> extends true ? unknown :
@@ -114,6 +111,14 @@ export type IsEmpty<T> =
                 Is<T, []> extends true ? true :
                     Is<(/* copy of objects/Keys */IsUniversal<T> extends true ? never : keyof T), never>;
 
+/** ✅
+ * Checks if a given type is in any | unknown | never.
+ *
+ * IsUniversal does not distribute union types.
+ *
+ * @param T a type
+ * @return true, if T is in any | unknown | never, false otherwise.
+ */
 export type IsUniversal<T> =
     [unknown] extends [T]
         ? true // covers any and unknown
