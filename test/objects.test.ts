@@ -5,76 +5,36 @@
  ******************************************************************************/
 
 import { assertType } from "typelevel-assert";
-import { Is, Join, Keys, Obj, Paths, Values } from "../src";
+import { Combine, Is, Keys, Obj, Paths, Values } from "../src";
 
-{ // Obj
+{ // Obj<Strict = true>
+
+    interface EmptyInterface {}
+    interface NonEmptyInterface { a: number }
 
     class EmptyClass {}
     class NonEmptyClass { a: number }
 
-    { // Obj<Strict = true>
-        assertType<Is<any extends Obj ? true : false, boolean>>();
-        assertType<Is<unknown extends Obj ? true : false, false>>();
-        assertType<Is<never extends Obj ? true : false, true>>();
-        assertType<Is<EmptyClass extends Obj ? true : false, false>>();
-        assertType<Is<NonEmptyClass extends Obj ? true : false, false>>();
-        assertType<Is<{} extends Obj ? true : false, true>>();
-        assertType<Is<{ a: number } extends Obj ? true : false, true>>();
-        assertType<Is<[] extends Obj ? true : false, false>>();
-        assertType<Is<[number] extends Obj ? true : false, false>>();
-        assertType<Is<(() => void) extends Obj ? true : false, false>>();
-        assertType<Is<string extends Obj ? true : false, false>>();
-        assertType<Is<number extends Obj ? true : false, false>>();
-        assertType<Is<boolean extends Obj ? true : false, false>>();
-        assertType<Is<symbol extends Obj ? true : false, false>>();
-        assertType<Is<bigint extends Obj ? true : false, false>>();
-        assertType<Is<null extends Obj ? true : false, false>>();
-        assertType<Is<undefined extends Obj ? true : false, false>>();
-        assertType<Is<void extends Obj ? true : false, false>>();
-    }
-
-    { // Obj<Strict = false>
-        assertType<Is<any extends Obj<false> ? true : false, boolean>>();
-        assertType<Is<unknown extends Obj<false> ? true : false, false>>();
-        assertType<Is<never extends Obj<false> ? true : false, true>>();
-        assertType<Is<EmptyClass extends Obj<false> ? true : false, true>>();
-        assertType<Is<NonEmptyClass extends Obj<false> ? true : false, true>>();
-        assertType<Is<{} extends Obj<false> ? true : false, true>>();
-        assertType<Is<{ a: number } extends Obj<false> ? true : false, true>>();
-        assertType<Is<[] extends Obj<false> ? true : false, true>>();
-        assertType<Is<[number] extends Obj<false> ? true : false, true>>();
-        assertType<Is<(() => void) extends Obj<false> ? true : false, true>>();
-        assertType<Is<string extends Obj<false> ? true : false, false>>();
-        assertType<Is<number extends Obj<false> ? true : false, false>>();
-        assertType<Is<boolean extends Obj<false> ? true : false, false>>();
-        assertType<Is<symbol extends Obj<false> ? true : false, false>>();
-        assertType<Is<bigint extends Obj<false> ? true : false, false>>();
-        assertType<Is<null extends Obj<false> ? true : false, false>>();
-        assertType<Is<undefined extends Obj<false> ? true : false, false>>();
-        assertType<Is<void extends Obj<false> ? true : false, false>>();
-    }
-
-    { // Obj<Strict = false> behaves like object
-        assertType<Is<any extends Obj<false> ? true : false, any extends object ? true : false>>();
-        assertType<Is<unknown extends Obj<false> ? true : false, unknown extends object ? true : false>>();
-        assertType<Is<never extends Obj<false> ? true : false, never extends object ? true : false>>();
-        assertType<Is<EmptyClass extends Obj<false> ? true : false, EmptyClass extends object ? true : false>>();
-        assertType<Is<NonEmptyClass extends Obj<false> ? true : false, NonEmptyClass extends object ? true : false>>();
-        assertType<Is<{} extends Obj<false> ? true : false, {} extends object ? true : false>>();
-        assertType<Is<{ a: number } extends Obj<false> ? true : false, { a: number } extends object ? true : false>>();
-        assertType<Is<[] extends Obj<false> ? true : false, [] extends object ? true : false>>();
-        assertType<Is<[number] extends Obj<false> ? true : false, [number] extends object ? true : false>>();
-        assertType<Is<(() => void) extends Obj<false> ? true : false, (() => void) extends object ? true : false>>();
-        assertType<Is<string extends Obj<false> ? true : false, string extends object ? true : false>>();
-        assertType<Is<number extends Obj<false> ? true : false, number extends object ? true : false>>();
-        assertType<Is<boolean extends Obj<false> ? true : false, boolean extends object ? true : false>>();
-        assertType<Is<symbol extends Obj<false> ? true : false, symbol extends object ? true : false>>();
-        assertType<Is<bigint extends Obj<false> ? true : false, bigint extends object ? true : false>>();
-        assertType<Is<null extends Obj<false> ? true : false, null extends object ? true : false>>();
-        assertType<Is<undefined extends Obj<false> ? true : false, undefined extends object ? true : false>>();
-        assertType<Is<void extends Obj<false> ? true : false, void extends object ? true : false>>();
-    }
-
+    assertType<Is<any extends Obj ? true : false, boolean>>();
+    assertType<Is<unknown extends Obj ? true : false, false>>();
+    assertType<Is<never extends Obj ? true : false, true>>();
+    assertType<Is<EmptyInterface extends Obj ? true : false, false>>();
+    assertType<Is<NonEmptyInterface extends Obj ? true : false, false>>();
+    assertType<Is<EmptyClass extends Obj ? true : false, false>>();
+    assertType<Is<NonEmptyClass extends Obj ? true : false, false>>();
+    assertType<Is<{} extends Obj ? true : false, true>>();
+    assertType<Is<{ a: number } extends Obj ? true : false, true>>();
+    assertType<Is<[] extends Obj ? true : false, false>>();
+    assertType<Is<[number] extends Obj ? true : false, false>>();
+    assertType<Is<(() => void) extends Obj ? true : false, false>>();
+    assertType<Is<string extends Obj ? true : false, false>>();
+    assertType<Is<number extends Obj ? true : false, false>>();
+    assertType<Is<boolean extends Obj ? true : false, false>>();
+    assertType<Is<symbol extends Obj ? true : false, false>>();
+    assertType<Is<bigint extends Obj ? true : false, false>>();
+    assertType<Is<null extends Obj ? true : false, false>>();
+    assertType<Is<undefined extends Obj ? true : false, false>>();
+    assertType<Is<void extends Obj ? true : false, false>>();
 }
 
 { // Keys<T>should fix keyof any = string | number | symbol
@@ -120,10 +80,10 @@ import { Is, Join, Keys, Obj, Paths, Values } from "../src";
 }
 
 { // Join should join universal types
-    assertType<Is<Join<any>, any>>();
-    assertType<Is<Join<unknown>, unknown>>();
-    assertType<Is<Join<never>, never>>();
-    assertType<Is<Join<{}>, {}>>();
+    assertType<Is<Combine<any>, any>>();
+    assertType<Is<Combine<unknown>, unknown>>();
+    assertType<Is<Combine<never>, never>>();
+    assertType<Is<Combine<{}>, {}>>();
 }
 
 { // Join should fulfil prerequisite Is<{ a: 1 } & { b: 2 }, { a: 1, b: 2 }> extends false
@@ -134,7 +94,7 @@ import { Is, Join, Keys, Obj, Paths, Values } from "../src";
 }
 
 { // Join should join intersection
-    type Actual = Join<{ a: 1 } & { b: 2 }>;
+    type Actual = Combine<{ a: 1 } & { b: 2 }>;
     type Expected = { a: 1, b: 2 };
     assertType<Is<Actual, Expected>>();
 }

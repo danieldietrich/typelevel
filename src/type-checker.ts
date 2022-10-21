@@ -4,12 +4,17 @@
  * terms of the MIT License, which is available in the project root.
  ******************************************************************************/
 
-import { Filter, Join, Map } from "./objects";
+import { Filter } from "./objects";
 
-export type CheckResult<A, V extends (A | CheckError)[], K extends PropertyKey = 'typelevel_error' , E = Filter<V, CheckError>> =
-    E extends [] ? A : {
-        [Key in K]: E
-    };
+export type CheckResult<A, V extends (A | CheckError)[], K extends PropertyKey = 'typelevel_error'> =
+    Filter<V, CheckError> extends infer E
+        ? E extends []
+            ? A
+            : { [Key in K]: E }
+        : never;
 
-export type CheckError<Message extends string = any, Cause = unknown, Help = unknown> =
-    Join<{ message: Message } & Map<Cause, { cause: Cause }> & Map<Help, { help: Help }>>;
+export type CheckError<Message extends string = any, Cause = any, Help extends string = any> = {
+    message: Message;
+    cause: Cause;
+    help: Help;
+};

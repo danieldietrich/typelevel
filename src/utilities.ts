@@ -18,11 +18,11 @@ export type UnionToIntersection<U> =
         ? I
         : never;
 
-// A | B => [A, B]
-export type UnionToTuple<T, L = LastOf<T>> =
+// A | B => [A, B] or [B, A], the order is spooky 👻
+export type UnionToTuple<T> =
     [T] extends [never]
         ? []
-        : [...UnionToTuple<Exclude<T, L>>, L];
+        : [...UnionToTuple<Exclude<T, LastOf<T> >>, LastOf<T>];
 
 type LastOf<T> =
     UnionToIntersection<T extends any ? () => T : never> extends () => infer R

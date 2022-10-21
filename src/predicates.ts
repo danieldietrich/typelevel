@@ -6,7 +6,11 @@
 
 import { UnionToTuple } from "./utilities";
 
-// logical and
+/**
+ * Logical and.
+ *
+ * @param C1
+ */
 export type And<C1 extends boolean, C2 extends boolean> =
     C1 extends true ? C2 : false;
 

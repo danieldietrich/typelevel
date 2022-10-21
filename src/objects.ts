@@ -5,67 +5,71 @@
  ******************************************************************************/
 
 import { Is, IsUniversal, Or } from "./predicates";
-import { UnionToIntersection } from "./utilities";
 
 /**
  * Obj represents a type with a set of properties. Obj is syntactic sugar for
- * Record<PropertyKey, unknown> (Strict = true) and
- * Record<PropertyKey, any> (Strict = false).
+ * Record<PropertyKey, unknown>, while the TS build-it object has the form
+ * Record<PropertyKey, any>.
  *
- * By default Obj strictly represents objects and does not include classes,
- * arrays, functions and primitives. We introduce the concept of strictness
- * to allow for more flexible representations of objects. Idiomatic types
- * that act on objects have a Strict parameter that is delegated to Obj.
+ * Obj does not match interfaces or classes because they are possible target
+ * for declaration merging, their properties are not fully known.
  *
- * Obj = Obj<true> = Record<PropertyKey, unknown> does not match interfaces or
- * classes (but the empty class A {}) because they are possible target for
- * declaration merging, their properties are not fully known.
- *
- * Obj<false> = Record<PropertyKey, any> = object matches all structures, with
- * and without inferrable index signature.
- *
- * Let EmptyClass = class A {} and NonEmptyClass = class A { a: number }.
- * Let IsObj<T, Strict extends boolean> = T extends Obj<Strict> ? true : false.
- * Then the following holds:
- *
- * |  T               | IsObj<T>       | IsObj<T, false> |
- * | ---------------- | -------------- | --------------- |
- * | any              | boolean        | boolean         |
- * | unknown          | false          | false           |
- * | never            | never¹⁾        | never¹⁾         |
- * | class A {}       | true           | true            |
- * | class A { k: V } | false          | true            |
- * | {}               | true           | true            |
- * | { k: V }         | true           | true            |
- * | []               | false          | true            |
- * | [number]         | false          | true            |
- * | () => void       | false          | true            |
- * | string           | false          | false           |
- * | number           | false          | false           |
- * | boolean          | false          | false           |
- * | symbol           | false          | false           |
- * | bigint           | false          | false           |
- * | null             | false          | false           |
- * | undefined        | false          | false           |
- * | void             | false          | false           |
- *
- * 1) never is the empty union and distributes over IsObj<T, Strict>.
- *    (never extends Obj ? true : false) is true.
+ * |  T                 | T extends Obj  | T extends object  |
+ * | ================== | ============== | ================= |
+ * | any                | boolean        | boolean           |
+ * | unknown            | false          | false             |
+ * | never              | true           | true              |
+ * | ------------------ | -------------- | ----------------- |
+ * | interface {}       | false          | true              |
+ * | interface { k: V } | false          | true              |
+ * | class {}           | false          | true              |
+ * | class { k: V }     | false          | true              |
+ * | {}                 | true           | true              |
+ * | { k: V }           | true           | true              |
+ * | []                 | false          | true              |
+ * | [number]           | false          | true              |
+ * | () => void         | false          | true              |
+ * | ------------------ | -------------- | ----------------- |
+ * | string             | false          | false             |
+ * | number             | false          | false             |
+ * | boolean            | false          | false             |
+ * | symbol             | false          | false             |
+ * | bigint             | false          | false             |
+ * | null               | false          | false             |
+ * | undefined          | false          | false             |
+ * | void               | false          | false             |
  *
  * See https://github.com/microsoft/TypeScript/issues/42825#issuecomment-780873604
  */
-export type Obj<Strict extends boolean = true> =
-    Record<PropertyKey, (Strict extends true ? unknown : any)>;
+export type Obj = Record<PropertyKey, unknown>;
 
 /**
- * Good alternative to keyof T if users want to get rid of special handling of
+ * Combines all properties of an intersection type A & B if T extends Obj<Strict>.
+ * This type does not differ from the built-in type "A & B" in any way,
+ * except for the Strict mode.
+ *
+ * A use case of Join is to flatten an intersection type of objects for display
+ * purposes.
+ *
+ * @param T a non-empty union of intersections
+ * @returns a non-empty union of objects
+ */
+export type Combine<T> =
+    T extends Obj
+        ? { [K in Keys<T>]:  T[K] }
+        : T;
+
+/**
+ * Good alternative to keyof T for getting rid of special handling of
  * universal types any/unknown/never at the use-site.
  *
  * @param T a type
  * @returns keyof T, any/unknown/never => never
  */
 export type Keys<T> =
-    IsUniversal<T> extends true ? never : keyof T;
+    IsUniversal<T> extends true
+        ? never
+        : keyof T;
 
 /**
  * Syntactic sugar for T[keyof T].
@@ -87,23 +91,23 @@ export type Values<T> = T[keyof T];
  * @param T a type
  * @returns a flattened object. any/unknown/never => any/unknown/never
  */
-export type Paths<T, Strict extends boolean = true> = _Paths<T, Strict>;
+export type Paths<T> = _Paths<T>;
 
 // don't expose calculated parameter P as public API
-type _Paths<T, Strict extends boolean, P = TupledPaths<T, Strict>> =
-    Or<Is<T, {}>, Or<Is<T, any>, Or<Is<T, unknown>, Is<T, never>>>> extends true
+type _Paths<T, P = TupledPaths<T>> =
+    Or<Is<T, {}>, IsUniversal<T>> extends true
         ? T
         : P extends [string, unknown]
             ? { [K in `${P[0]}`]: P[1] }
             : never;
 
 // currently symbol keys are not supported
-type TupledPaths<T, Strict extends boolean = true, K = Keys<T>> =
-    T extends Obj<Strict>
+type TupledPaths<T, K = Keys<T>> =
+    T extends Obj
         ? K extends string | number
-            ? Or<Is<T[K], any>, Is<T[K], never>> extends true
+            ? IsUniversal<T[K]> extends true
                 ? [`${K}`, T[K]]
-                : T[K] extends Record<string | number, unknown>
+                : T[K] extends Obj
                     ? TupledPaths<T[K]> extends infer F
                         ? F extends [string, unknown]
                             ? [`${K}.${F[0]}`, F[1]]
@@ -113,66 +117,26 @@ type TupledPaths<T, Strict extends boolean = true, K = Keys<T>> =
             : never
         : never;
 
-// Default if T is undefined, otherwise T
-export type Default<T, Default> = Is<T, undefined> extends true ? ([Default] extends [Default] ? true : false) : T;
-
 // TODO(@@dd): test this for T in any | unknown | never
-export type Filter<T, V, Options extends FilterOptions = {
-    condition: false
-}> =
-    T extends any[] ? FilterArray<T, V, Default<Options['condition'], true>> :
-        T extends Obj<Default<Options['strict'], true>> ? FilterObj<T, V, Default<Options['condition'], true>> :
+// C = Condition
+// See also https://www.typescriptlang.org/docs/handbook/utility-types.html#extracttype-union
+export type Filter<T, V, C extends boolean = true> =
+    T extends any[] ? FilterArray<T, V, C> :
+        T extends Obj ? FilterObj<T, V, C> :
             never;
 
-export type FilterOptions = {
-    condition?: boolean;
-    relation?: 'extends' | 'super' | 'is';
-    strict?: boolean;
-}
-
-type O = undefined | number;
-
 // TODO(@@dd): test if [K in keyof T] works for T in any | unknown | never
-type FilterObj<T, V, Condition extends boolean> =
+type FilterObj<T, V, C extends boolean> =
     Pick<T, {
         [K in keyof T]-?: T[K] extends V
-            ? Condition extends true ? K : never
-            : Condition extends true ? never : K
+            ? C extends true ? K : never
+            : C extends true ? never : K
     }[Keys<T>]>;
 
-type FilterArray<A extends any[], V, Condition extends boolean> =
+type FilterArray<A, V, C extends boolean> =
     A extends [] ? [] :
         A extends [infer H, ...infer T]
             ? H extends V
-                ? Condition extends true ? [H, ...FilterArray<T, V, Condition>] : FilterArray<T, V, Condition>
-                : Condition extends true ? FilterArray<T, V, Condition> : [H, ...FilterArray<T, V, Condition>]
+                ? C extends true ? [H, ...FilterArray<T, V, C>] : FilterArray<T, V, C>
+                : C extends true ? FilterArray<T, V, C> : [H, ...FilterArray<T, V, C>]
             : [];
-
-// Map preserves union results
-// TODO(@@dd): Map<T = any, R = unknown> = [unknown] extends [T] ? unknown : R;
-export type Map<T = any, R = unknown> =
-    [unknown] extends [T] ? unknown : R;
-
-// FlatMap distributes a union and flattens the result
-export type FlatMap<T = any, R = unknown> =
-    Flatten<Map<T, R>>;
-
-// Flattens union types
-// TODO(@@dd): compare this with other semantics, like https://catchts.com/flatten-union
-export type Flatten<T extends Map> =
-    Join<UnionToIntersection<T>>;
-
-/**
- * Merges all properties of an intersection type A & B if T extends Obj<Strict>.
- * This type does not differ from the built-in type "A & B" in any way,
- * except for the Strict mode.
- *
- * A use case of Join is to flatten an intersection type of objects for display
- * purposes.
- *
- * @param T a non-empty union of intersections
- * @param Strict only objects of type Obj<Strict> are merged
- * @returns a non-empty union of objects
- */
-export type Join<T, Strict extends boolean = true> =
-    T extends Obj<Strict> ? { [K in Keys<T>]:  T[K] } : T;
