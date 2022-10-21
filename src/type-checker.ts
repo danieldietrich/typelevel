@@ -15,7 +15,7 @@ export type CheckResult<A, V extends (A | CheckError)[], K extends PropertyKey =
         : never;
 
 // ✅
-export type CheckError<Message extends string = any, Cause = any, Help extends string = any> = {
+export type CheckError<Message = any, Cause = any, Help = any> = {
     message: Message;
     cause: Cause;
     help: Help;
