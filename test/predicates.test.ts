@@ -5,7 +5,7 @@
  ******************************************************************************/
 
 import { assertType } from "typelevel-assert";
-import { Extends, Fn, Is, IsEmpty, IsIn, Obj } from "../src";
+import { Extends, Fn, Is, IsEmpty, IsIn, IsUniversal, Obj } from "../src";
 
 { // IsIn
 
@@ -59,6 +59,13 @@ import { Extends, Fn, Is, IsEmpty, IsIn, Obj } from "../src";
     type Actual = IsEmpty<{ a: 1 }>;
     type Expected = false;
     assertType<Is<Actual, Expected>>();
+}
+
+{ // IsUniversal<T>
+    assertType<Is<IsUniversal<any>, true>>();
+    assertType<Is<IsUniversal<unknown>, true>>();
+    assertType<Is<IsUniversal<never>, true>>();
+    assertType<Is<IsUniversal<1>, false>>();
 }
 
 { // Extends

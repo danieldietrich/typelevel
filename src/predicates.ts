@@ -115,4 +115,8 @@ export type IsEmpty<T> =
                     Is<(/* copy of objects/Keys */IsUniversal<T> extends true ? never : keyof T), never>;
 
 export type IsUniversal<T> =
-    Or<Is<T, any>, Or<Is<T, unknown>, Is<T, never>>>;
+    [unknown] extends [T]
+        ? true // covers any and unknown
+        : [T] extends [never]
+            ? true
+            : false;
