@@ -126,13 +126,36 @@ type AllOf<T, U extends any[], Strict extends boolean> =
         ? Strict extends true ? Is<Head, T> : Extends<Head, T> extends true ? AllOf<T, Tail, Strict> : false
         : true;
 
-// TODO(@@dd): remove special handling of any | unknown | never
+/** ✅
+ * Checks if an object is empty. Arrays, classes and functions are not supported.
+ *
+ * | T               | IsEmpty<T> |
+ * | =============== | ========== |
+ * | any             | boolean    |
+ * | unknown         | never      |
+ * | never           | never      |
+ * | --------------- | ---------- |
+ * | {}              | true       |
+ * | { a: 1 }        | false      |
+ * | []              | true       |
+ * | [1]             | false      |
+ * | () => void      | true       |
+ * | class {}        | true       |
+ * | class { _ = 1 } | false      |
+ * | --------------- | --------- |
+ * | <otherwise>     | never     |
+ *
+ * @param T a type
+ * @returns true, if T is empty, otherwise false
+ */
 export type IsEmpty<T> =
-    Is<T, any> extends true ? boolean :
-        Is<T, unknown> extends true ? unknown :
-            Is<T, never> extends true ? never :
-                Is<T, []> extends true ? true :
-                    Is<(/* copy of objects/Keys */IsUniversal<T> extends true ? never : keyof T), never>;
+    T extends object
+        ? T extends []
+            ? true
+            : [keyof T] extends [never]
+                ? true
+                : false
+        : never;
 
 /** ✅
  * Checks if a given type is in any | unknown | never.

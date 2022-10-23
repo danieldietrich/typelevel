@@ -82,15 +82,42 @@ import { And, Equals, Extends, Fn, Is, IsEmpty, IsIn, IsUniversal, Not, Obj, Or 
 
     { // IsEmpty<T> should work for universal types
         assertType<Is<IsEmpty<any>, boolean>>();
-        assertType<Is<IsEmpty<unknown>, unknown>>();
+        assertType<Is<IsEmpty<unknown>, never>>();
         assertType<Is<IsEmpty<never>, never>>();
-        assertType<Is<IsEmpty<{}>, true>>();
     }
 
-    { // IsEmpty<T> should work for non-empty object
-        type Actual = IsEmpty<{ a: 1 }>;
-        type Expected = false;
-        assertType<Is<Actual, Expected>>();
+    { // IsEmpty<T> should work for objects
+        assertType<Is<IsEmpty<{}>, true>>();
+        assertType<Is<IsEmpty<{ a: 1 }>, false>>();
+    }
+
+    { // IsEmpty<T> should work for arrays
+        type T = IsEmpty<[]>;
+        assertType<Is<IsEmpty<[]>, true>>();
+        assertType<Is<IsEmpty<[1]>, false>>();
+    }
+
+    { // IsEmpty<T> should work for functions
+        assertType<Is<IsEmpty<() => void>, true>>();
+        assertType<Is<IsEmpty<() => 1>, true>>();
+        assertType<Is<IsEmpty<(a: 1) => void>, true>>();
+    }
+
+    { // IsEmpty<T> should work for classes
+        class A {}
+        class B { b = true }
+        assertType<Is<IsEmpty<A>, true>>();
+        assertType<Is<IsEmpty<B>, false>>();
+    }
+
+    { // IsEmpty<T> should work for simple types
+        assertType<Is<IsEmpty<0>, never>>();
+        assertType<Is<IsEmpty<1>, never>>();
+        assertType<Is<IsEmpty<''>, never>>();
+        assertType<Is<IsEmpty<'a'>, never>>();
+        assertType<Is<IsEmpty<null>, never>>();
+        assertType<Is<IsEmpty<undefined>, never>>();
+        assertType<Is<IsEmpty<void>, never>>();
     }
 
 }
