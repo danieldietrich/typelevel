@@ -7,8 +7,8 @@
 import { Filter } from "./objects";
 
 // ✅
-export type CheckResult<A, V extends (A | CheckError)[], K extends PropertyKey = 'typelevel_error'> =
-    Filter<V, CheckError> extends infer E
+export type CheckResult<A, C extends (A | CheckError)[], K extends PropertyKey = 'typelevel_error'> =
+    Filter<C, CheckError> extends infer E
         ? E extends []
             ? A
             : { [Key in K]: E }
