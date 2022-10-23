@@ -6,15 +6,32 @@
 
 import { UnionToTuple } from "./utilities";
 
-// logical and
+/** ✅
+ * Logical and.
+ *
+ * @param C1 a boolean condition
+ * @param C2 a boolean condition
+ * @returns false, if one of C1, C2 is false, otherwise true or boolean
+ */
 export type And<C1 extends boolean, C2 extends boolean> =
     C1 extends true ? C2 : false;
 
-// logical or
+/** ✅
+ * Logical or.
+ *
+ * @param C1 a boolean condition
+ * @param C2 a boolean condition
+ * @returns false, if both C1, C2 are false, otherwise true or boolean
+ */
 export type Or<C1 extends boolean, C2 extends boolean> =
     C1 extends true ? true : C2;
 
-// logical not
+/** ✅
+ * Logical not.
+ *
+ * @param C a boolean condition
+ * @returns true if C is false vice versa, boolean if C is boolean
+ */
 export type Not<C extends boolean> =
     C extends true ? false : true;
 
