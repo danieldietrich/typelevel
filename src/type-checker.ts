@@ -6,7 +6,7 @@
 
 import { Filter } from "./objects";
 
-/** ✅
+/**
  * Represents a check result of type T. If all checks C pass, T is returned,
  * otherwise an error with a list of failed checks is returned
  *
@@ -28,7 +28,7 @@ export type CheckResult<T, E extends (T | CheckError)[], K extends PropertyKey =
             : { [Key in K]: C }
         : never;
 
-/** ✅
+/**
  * Represents a type check error.
  *
  * @param Message an optional short and descriptive error message

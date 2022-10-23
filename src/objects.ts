@@ -6,7 +6,7 @@
 
 import { IsUniversal } from "./predicates";
 
-/** ✅
+/**
  * Combines all properties of an intersection type A & B.
  * Combine does not differ from the built-in type A & B.
  *
@@ -17,7 +17,7 @@ import { IsUniversal } from "./predicates";
  */
 export type Combine<T> = { [K in (keyof T)]: T[K] };
 
-/** ✅
+/**
  * Obj represents a type with a set of properties. Obj is syntactic sugar for
  * Record<PropertyKey, unknown>, while the TS build-it object has the form
  * Record<PropertyKey, any>.
@@ -54,7 +54,7 @@ export type Combine<T> = { [K in (keyof T)]: T[K] };
  */
 export type Obj = Record<PropertyKey, unknown>;
 
-/** ✅
+/**
  * Convenience type alias for keyof T, with a fix for one common mistake:
  *
  *    { [x in keyof any]: any }
@@ -70,7 +70,7 @@ export type Obj = Record<PropertyKey, unknown>;
  */
 export type Keys<T> = keyof T;
 
-/** ✅
+/**
  * Syntactic sugar for T[keyof T].
  *
  * Values does not distribute union types.
@@ -80,7 +80,7 @@ export type Keys<T> = keyof T;
  */
 export type Values<T> = T[keyof T];
 
-/** ✅
+/**
  * Deep-flattens object keys by recursively traversing the type structure and
  * concatenating all keys with dot '.'.
  *
@@ -125,7 +125,7 @@ type TupledPaths<T extends Obj, K extends string | number = Exclude<keyof T, sym
                     ? [`${K}.${TupledPaths<V>[0]}`, TupledPaths<V>[1]]
                     : [`${K}`, V];
 
-/** ✅
+/**
  * Filters arrays and objects of type T by comparing their values with the given
  * union type V. A value is part of the result, if it is assignable to V.
  *

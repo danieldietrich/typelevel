@@ -240,12 +240,14 @@ import { Combine, Equals, Filter, Is, Keys, Obj, Paths, Values } from "../src";
     }
 
     { // Filter should distribute objects
-        assertType<Equals<Filter<{ a: 1 } | { b: '' }, number>, { a: 1 } | {}>>();
+        type Actual = Filter<{ a: 1 } | { b: '' }, number>;
+        type Expected = Filter<{ a: 1 }, number> | Filter<{ b: '' }, number>;
+        assertType<Equals<Actual, Expected>>();
     }
 
     { // Filter should distribute arrays
         type Actual = Filter<[1] | [''], number>;
-        type Expected = [1] | [];
+        type Expected = Filter<[1], number> | Filter<[''], number>;
         assertType<Equals<Actual, Expected>>();
     }
 

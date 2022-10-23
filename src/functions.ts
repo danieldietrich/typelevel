@@ -4,7 +4,7 @@
  * terms of the MIT License, which is available in the project root.
  ******************************************************************************/
 
-/** ✅
+/**
  * Represents a function type with a variable number of arguments and a return type.
  *
  * Examples:

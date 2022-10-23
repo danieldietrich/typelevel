@@ -4,7 +4,7 @@
  * terms of the MIT License, which is available in the project root.
  ******************************************************************************/
 
-/** ✅
+/**
  * Tuples to intersection
  *
  * [A, B] => A & B
@@ -15,7 +15,7 @@
 export type TupleToIntersection<T extends any[]> =
     UnionToIntersection<TupleToUnion<T>>;
 
-/** ✅
+/**
  * Tuple to union
  *
  * [A, B] => A | B
@@ -26,7 +26,7 @@ export type TupleToIntersection<T extends any[]> =
 export type TupleToUnion<T extends any[]> =
     T[number];
 
-/** ✅
+/**
  * Union to intersection
  *
  * A | B => A & B
@@ -39,7 +39,7 @@ export type UnionToIntersection<U> =
         ? I
         : never;
 
-/** ✅
+/**
  * Union to tuple. Use this with caution, the order of the tuple
  * elements is not predictable.
  *

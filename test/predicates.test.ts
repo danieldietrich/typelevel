@@ -5,7 +5,7 @@
  ******************************************************************************/
 
 import { assertType } from "typelevel-assert";
-import { And, Equals, Extends, Fn, Is, IsEmpty, IsIn, IsUniversal, Not, Obj, Or } from "../src";
+import { And, Equals, Extends, Fn, Is, IsEach, IsEmpty, IsIn, IsUniversal, Not, Obj, Or } from "../src";
 
 { // And
     assertType<Is<And<true, true>, true>>();
@@ -109,21 +109,98 @@ import { And, Equals, Extends, Fn, Is, IsEmpty, IsIn, IsUniversal, Not, Obj, Or 
     }
 
     { // IsIn should consider class hierarchies
-        assertType<Is<IsIn<C2, A | C1>, true>>();
-        assertType<Is<IsIn<C1, A | C2>, false>>();
+        assertType<Is<IsIn<C2, A>, true>>();
+        assertType<Is<IsIn<C2, C3>, false>>();
         assertType<Is<IsIn<C2, A | C3>, true>>();
     }
 
-    { // IsIn should not consider interfaces
+    { // IsIn should distribute
+        assertType<Is<IsIn<C1 | C2, C>, IsIn<C1, C> | IsIn<C2, C>>>();
+        assertType<Is<IsIn<C1 | C2, C>, boolean>>();
+        assertType<Is<IsIn<C1, C>, true>>();
+        assertType<Is<IsIn<C2, C>, false>>();
+
+        assertType<Is<IsIn<C1 | C2, A>, IsIn<C1, A> | IsIn<C2, A>>>();
+        assertType<Is<IsIn<C1 | C2, A>, true>>();
+        assertType<Is<IsIn<C1, A>, true>>();
+        assertType<Is<IsIn<C2, A>, true>>();
+    }
+
+    { // IsIn should consider interfaces
+        assertType<Is<IsIn<I1, A>, true>>();
+        assertType<Is<IsIn<I1, I2>, true>>();
+        assertType<Is<IsIn<I1, A | I2>, true>>();
+
+        assertType<Is<IsIn<I2, A>, true>>();
+        assertType<Is<IsIn<I2, I1>, false>>();
         assertType<Is<IsIn<I2, A | I1>, true>>();
-        assertType<Is<IsIn<I1, A | I2>, false>>();
     }
 
 }
 
 { // IsEach
 
-    // TODO(@@dd)
+    interface A {
+        a: number;
+    }
+    interface B {
+        b: number;
+    }
+    interface C {
+        c: number;
+    }
+    interface I1 extends A, B, C {
+    }
+    interface I2 extends A, B {
+    }
+    class C2 implements A, B {
+        a = 1;
+        b = 1;
+    }
+    class C1 extends C2 implements C {
+        c = 1;
+    }
+    class C3 implements A, B, C {
+        a = 1;
+        b = 1;
+        c = 1;
+    }
+
+    { // IsEach should consider class hierarchies
+        assertType<Is<IsEach<C1, A>, true>>();
+        assertType<Is<IsEach<C1, C2>, true>>();
+        assertType<Is<IsEach<C1, A | C2>, true>>();
+
+        assertType<Is<IsEach<C2, A>, true>>();
+        assertType<Is<IsEach<C2, C3>, false>>();
+        assertType<Is<IsEach<C2, A | C3>, false>>();
+
+        assertType<Is<IsEach<C2, C>, false>>();
+        assertType<Is<IsEach<C2, C3>, false>>();
+        assertType<Is<IsEach<C2, A | C3>, false>>();
+    }
+
+    { // IsEach should distribute
+        assertType<Is<IsEach<C1 | C2, C>, IsEach<C1, C> | IsEach<C2, C>>>();
+        assertType<Is<IsEach<C1 | C2, C>, boolean>>();
+        assertType<Is<IsEach<C1, C>, true>>();
+        assertType<Is<IsEach<C2, C>, false>>();
+
+        assertType<Is<IsEach<C1 | C2, A>, IsEach<C1, A> | IsEach<C2, A>>>();
+        assertType<Is<IsEach<C1 | C2, A>, true>>();
+        assertType<Is<IsEach<C1, A>, true>>();
+        assertType<Is<IsEach<C2, A>, true>>();
+    }
+
+    { // IsEach should not consider interfaces
+        assertType<Is<IsEach<I1, A>, true>>();
+        assertType<Is<IsEach<I1, I2>, true>>();
+        assertType<Is<IsEach<I1, A | I2>, true>>();
+
+        assertType<Is<IsEach<I2, A>, true>>();
+        assertType<Is<IsEach<I2, I1>, false>>();
+        assertType<Is<IsEach<I2, A | I1>, false>>();
+    }
 
 }
 

@@ -6,7 +6,7 @@
 
 import { UnionToTuple } from "./utilities";
 
-/** ✅
+/**
  * Logical and.
  *
  * @param C1 a boolean condition
@@ -16,7 +16,7 @@ import { UnionToTuple } from "./utilities";
 export type And<C1 extends boolean, C2 extends boolean> =
     C1 extends true ? C2 : false;
 
-/** ✅
+/**
  * Logical or.
  *
  * @param C1 a boolean condition
@@ -26,7 +26,7 @@ export type And<C1 extends boolean, C2 extends boolean> =
 export type Or<C1 extends boolean, C2 extends boolean> =
     C1 extends true ? true : C2;
 
-/** ✅
+/**
  * Logical not.
  *
  * @param C a boolean condition
@@ -35,7 +35,7 @@ export type Or<C1 extends boolean, C2 extends boolean> =
 export type Not<C extends boolean> =
     C extends true ? false : true;
 
-/** ✅
+/**
  * returns true if T1 equals T2
  */
 export type Equals<T1, T2> =
@@ -43,7 +43,7 @@ export type Equals<T1, T2> =
         ? true
         : false;
 
-/** ✅
+/**
  * Syntactic sugar for A1 extends A2 ? true : false.
  *
  * Extends does not distribute union types, i.e. Extends<A, never> = true.
@@ -57,7 +57,7 @@ export type Equals<T1, T2> =
 export type Extends<T1, T2> =
     [T1] extends [T2] ? true : false;
 
-/** ✅
+/**
  * Returns true if T1 is exactly T2. Does not distribute unions.
  *
  * See also Equals.
@@ -72,7 +72,7 @@ export type Is<T1, T2> =
         ? true
         : false;
 
-/** ✅
+/**
  * Checks if any element in the union U is assignable to T.
  *
  * @param T a union type
@@ -84,10 +84,10 @@ export type IsIn<T, U> =
 
 type Exists<T, U extends any[]> =
     U extends [infer Head, ...infer Tail]
-        ? [Head] extends [T] ? true : Exists<T, Tail>
+        ? T extends Head ? true : Exists<T, Tail>
         : false;
 
-/** ✅
+/**
  * Checks if each element in the union U is assignable to T.
  *
  * @param T a union type
@@ -99,10 +99,10 @@ export type IsEach<T, U> =
 
 type AllOf<T, U extends any[]> =
     U extends [infer Head, ...infer Tail]
-        ? [Head] extends [T] ? AllOf<T, Tail> : false
+        ? T extends Head ? AllOf<T, Tail> : false
         : true;
 
-/** ✅
+/**
  * Checks if an object is empty. Arrays, classes and functions are not supported.
  *
  * | T               | IsEmpty<T> |
@@ -133,7 +133,7 @@ export type IsEmpty<T> =
                 : false
         : never;
 
-/** ✅
+/**
  * Checks if a given type is in any | unknown | never.
  *
  * IsUniversal does not distribute union types.
