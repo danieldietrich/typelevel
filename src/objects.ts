@@ -25,7 +25,7 @@ export type Combine<T> = { [K in (keyof T)]: T[K] };
  * Obj does not match interfaces or classes because they are possible target
  * for declaration merging, their properties are not fully known.
  *
- * |  T                 | T extends Obj  | T extends object  |
+ * | T                  | T extends Obj  | T extends object  |
  * | ================== | ============== | ================= |
  * | any                | boolean        | boolean           |
  * | unknown            | false          | false             |
@@ -91,7 +91,7 @@ export type Values<T> = T[keyof T];
  * string literal types under the hood to concatenate keys. This is why only
  * keys in string | number are supported, symbols are ignored.
  *
- * |  T                  | Paths<T>                 |
+ * | T                   | Paths<T>                 |
  * | =================== | ======================== |
  * | any                 | { [x: string]: any }     |
  * | unknown             | never                    |
@@ -125,9 +125,27 @@ type TupledPaths<T extends Obj, K extends string | number = Exclude<keyof T, sym
                     ? [`${K}.${TupledPaths<V>[0]}`, TupledPaths<V>[1]]
                     : [`${K}`, V];
 
-// TODO(@@dd): test this for T in any | unknown | never
-// C = Condition
-// See also https://www.typescriptlang.org/docs/handbook/utility-types.html#extracttype-union
+/** ✅
+ * Filters arrays and objects of type T by comparing their values with the given
+ * union type V. A value is part of the result, if it is assignable to V.
+ *
+ * | T        |  V       | Filter<T, V>                 |
+ * | ======== | ======== | ============================ |
+ * | { a: 1 } | any      | T                            |
+ * | { a: 1 } | unknown  | T                            |
+ * | { a: 1 } | never    | {}                           |
+ * | -------- | -------- | ---------------------------- |
+ * | [1]      | any      | T                            |
+ * | [1]      | unknown  | T                            |
+ * | [1]      | never    | []                           |
+ * | -------- | -------- | ---------------------------- |
+ * | A \| B   | V        | Filter<A, V> \| Filter<B, V> |
+ *
+ * @param T a union of arrays and objects (distributed)
+ * @param V a union of types that will be compared to the values of T (non-distributed)
+ * @param C a boolean condition which negates the filter, if false
+ * @returrns a filtered version of T or never
+ */
 export type Filter<T, V, C extends boolean = true> =
     T extends any[] ? FilterArray<T, V, C> :
         T extends Obj ? FilterObj<T, V, C> :
