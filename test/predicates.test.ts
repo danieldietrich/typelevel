@@ -5,7 +5,37 @@
  ******************************************************************************/
 
 import { assertType } from "typelevel-assert";
-import { Equals, Extends, Fn, Is, IsEmpty, IsIn, IsUniversal, Obj } from "../src";
+import { And, Equals, Extends, Fn, Is, IsEmpty, IsIn, IsUniversal, Not, Obj, Or } from "../src";
+
+{ // And
+    assertType<Is<And<true, true>, true>>();
+    assertType<Is<And<true, false>, false>>();
+    assertType<Is<And<false, true>, false>>();
+    assertType<Is<And<false, false>, false>>();
+    assertType<Is<And<boolean, true>, boolean>>();
+    assertType<Is<And<boolean, false>, false>>();
+    assertType<Is<And<true, boolean>, boolean>>();
+    assertType<Is<And<false, boolean>, false>>();
+    assertType<Is<And<boolean, boolean>, boolean>>();
+}
+
+{ // Or
+    assertType<Is<Or<true, true>, true>>();
+    assertType<Is<Or<true, false>, true>>();
+    assertType<Is<Or<false, true>, true>>();
+    assertType<Is<Or<false, false>, false>>();
+    assertType<Is<Or<boolean, true>, true>>();
+    assertType<Is<Or<boolean, false>, boolean>>();
+    assertType<Is<Or<true, boolean>, true>>();
+    assertType<Is<Or<false, boolean>, boolean>>();
+    assertType<Is<Or<boolean, boolean>, boolean>>();
+}
+
+{ // Not
+    assertType<Is<Not<true>, false>>();
+    assertType<Is<Not<false>, true>>();
+    assertType<Is<Not<boolean>, boolean>>();
+}
 
 { // IsIn
 
