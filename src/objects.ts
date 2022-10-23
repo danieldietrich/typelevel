@@ -144,7 +144,7 @@ type FilterObj<T, V, C extends boolean> =
 type FilterArray<A, V, C extends boolean> =
     A extends [] ? [] :
         A extends [infer H, ...infer T]
-            ? H extends V
+            ? [H] extends [V]
                 ? C extends true ? [H, ...FilterArray<T, V, C>] : FilterArray<T, V, C>
                 : C extends true ? FilterArray<T, V, C> : [H, ...FilterArray<T, V, C>]
             : [];

@@ -5,7 +5,7 @@
  ******************************************************************************/
 
 import { assertType } from "typelevel-assert";
-import { Extends, Fn, Is, IsEmpty, IsIn, IsUniversal, Obj } from "../src";
+import { Equals, Extends, Fn, Is, IsEmpty, IsIn, IsUniversal, Obj } from "../src";
 
 { // IsIn
 
@@ -77,7 +77,7 @@ import { Extends, Fn, Is, IsEmpty, IsIn, IsUniversal, Obj } from "../src";
     { // IsUniversal should not distribute union types
         type Actual = IsUniversal<number| any>;
         type Expected = true; // instead of boolean = false | true
-        assertType<Is<Actual, Expected>>();
+        assertType<Equals<Actual, Expected>>();
     }
 
 }
@@ -217,7 +217,7 @@ import { Extends, Fn, Is, IsEmpty, IsIn, IsUniversal, Obj } from "../src";
     { // Extends should not distribute
         type Actual = Extends<never, { a: 1 } | { b: 1 }>; // would be never, if Extends distributed unions
         type Expected = never extends { a: 1 } | { b: 1 } ? true : false; // = true
-        assertType<Is<Actual, Expected>>();
+        assertType<Equals<Actual, Expected>>();
     }
 
 }

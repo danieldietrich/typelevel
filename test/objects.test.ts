@@ -5,7 +5,7 @@
  ******************************************************************************/
 
 import { assertType } from "typelevel-assert";
-import { Combine, Is, Keys, Obj, Paths, Values } from "../src";
+import { Combine, Equals, Filter, Is, Keys, Obj, Paths, Values } from "../src";
 
 { // Obj
 
@@ -63,7 +63,7 @@ import { Combine, Is, Keys, Obj, Paths, Values } from "../src";
     { // Key should not distribute union types
         type Actual = Keys<{ a: { b: 1 } } | { b: { c: 2 } }>;
         type Expected = never;
-        assertType<Is<Actual, Expected>>();
+        assertType<Equals<Actual, Expected>>();
     }
 
 }
@@ -94,7 +94,7 @@ import { Combine, Is, Keys, Obj, Paths, Values } from "../src";
     { // Values should not distribute union types
         type Actual = Values<{ a: { b: 1 } } | { b: { c: 2 } }>;
         type Expected = never;
-        assertType<Is<Actual, Expected>>();
+        assertType<Equals<Actual, Expected>>();
     }
 
 }
@@ -130,7 +130,7 @@ import { Combine, Is, Keys, Obj, Paths, Values } from "../src";
     { // Combine should distribute union types
         type Actual = Combine<{ a: 1 } & { b: 1 } | { a: 2 } & { c: 2 }>;
         type Expected = { a: 1; b: 1} | { a: 2; c: 2 };
-        assertType<Is<Actual, Expected>>();
+        assertType<Equals<Actual, Expected>>();
     }
 
 }
@@ -205,7 +205,54 @@ import { Combine, Is, Keys, Obj, Paths, Values } from "../src";
     { // Paths should distribute
         type Actual = Paths<{ a: { b: 1 } } | { b: { c: 2 } }>;
         type Expected = { 'a.b': 1 } | { 'b.c': 2 };
-        assertType<Is<Actual, Expected>>();
+        assertType<Equals<Actual, Expected>>();
+    }
+
+}
+
+{ // Filter
+
+    type O = { a: 1, b: '', c: true };
+    type A = [1, '', true];
+
+    { // Filter should work for objects and selectors for universal types any | unknown | never
+        assertType<Is<Filter<O, any>, O>>();
+        assertType<Is<Filter<O, unknown>, O>>();
+        assertType<Is<Filter<O, never>, {}>>();
+    }
+
+    { // Filter should work for objects and selectors for primitive types
+        assertType<Is<Filter<O, number>, { a: 1 }>>();
+        assertType<Is<Filter<O, string>, { b: '' }>>();
+        assertType<Is<Filter<O, boolean>, { c: true }>>();
+    }
+
+    { // Filter should work for arrays and selectors for universal types any | unknown | never
+        assertType<Is<Filter<A, any>, A>>();
+        assertType<Is<Filter<A, unknown>, A>>();
+        assertType<Is<Filter<A, never>, []>>();
+    }
+
+    { // Filter should work for arrays and selectors for primitive types
+        assertType<Is<Filter<A, number>, [1]>>();
+        assertType<Is<Filter<A, string>, ['']>>();
+        assertType<Is<Filter<A, boolean>, [true]>>();
+    }
+
+    { // Filter should distribute objects
+        assertType<Equals<Filter<{ a: 1 } | { b: '' }, number>, { a: 1 } | {}>>();
+    }
+
+    { // Filter should distribute arrays
+        type Actual = Filter<[1] | [''], number>;
+        type Expected = [1] | [];
+        assertType<Equals<Actual, Expected>>();
+    }
+
+    { // Filter should distribute a mixture of objects and arrays
+        type Actual = Filter<{ a: 1 } | [1] | { b: '' } | [''], number>;
+        type Expected = { a: 1 } | [1] | {} | [];
+        assertType<Equals<Actual, Expected>>();
     }
 
 }
