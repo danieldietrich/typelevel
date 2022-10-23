@@ -215,25 +215,25 @@ import { Combine, Equals, Filter, Is, Keys, Obj, Paths, Values } from "../src";
     type O = { a: 1, b: '', c: true };
     type A = [1, '', true];
 
-    { // Filter should work for objects and selectors for universal types any | unknown | never
+    { // Filter should work for objects and universal selectors any | unknown | never
         assertType<Is<Filter<O, any>, O>>();
         assertType<Is<Filter<O, unknown>, O>>();
         assertType<Is<Filter<O, never>, {}>>();
     }
 
-    { // Filter should work for objects and selectors for primitive types
+    { // Filter should work for objects and primitive selectors
         assertType<Is<Filter<O, number>, { a: 1 }>>();
         assertType<Is<Filter<O, string>, { b: '' }>>();
         assertType<Is<Filter<O, boolean>, { c: true }>>();
     }
 
-    { // Filter should work for arrays and selectors for universal types any | unknown | never
+    { // Filter should work for arrays and universal selectors any | unknown | never
         assertType<Is<Filter<A, any>, A>>();
         assertType<Is<Filter<A, unknown>, A>>();
         assertType<Is<Filter<A, never>, []>>();
     }
 
-    { // Filter should work for arrays and selectors for primitive types
+    { // Filter should work for arrays and primitive selectors
         assertType<Is<Filter<A, number>, [1]>>();
         assertType<Is<Filter<A, string>, ['']>>();
         assertType<Is<Filter<A, boolean>, [true]>>();
@@ -252,6 +252,18 @@ import { Combine, Equals, Filter, Is, Keys, Obj, Paths, Values } from "../src";
     { // Filter should distribute a mixture of objects and arrays
         type Actual = Filter<{ a: 1 } | [1] | { b: '' } | [''], number>;
         type Expected = { a: 1 } | [1] | {} | [];
+        assertType<Equals<Actual, Expected>>();
+    }
+
+    { // Filter not should distribute a union of selectors when filtering an object
+        type Actual = Filter<O, number | string>;
+        type Expected = { a: 1, b: '' };
+        assertType<Equals<Actual, Expected>>();
+    }
+
+    { // Filter not should distribute a union of selectors when filtering an array
+        type Actual = Filter<A, number | string>;
+        type Expected = [1, '']
         assertType<Equals<Actual, Expected>>();
     }
 
