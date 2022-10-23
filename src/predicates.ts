@@ -55,6 +55,15 @@ export type Equals<T1, T2> =
 export type Extends<T1, T2> =
     [T1] extends [T2] ? true : false;
 
+/** ✅
+ * Returns true if T1 is exactly T2. Does not distribute unions.
+ *
+ * See also Equals.
+ *
+ * @param T1 a type
+ * @param T2 a type
+ * @returns true, if T1 is exacly T2
+ */
 // returns true if T1 is exactly T2
 export type Is<T1, T2> =
     (<T>() => T extends T2 ? true : false) extends (<T>() => T extends T1 ? true : false)
