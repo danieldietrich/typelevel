@@ -72,69 +72,34 @@ export type Is<T1, T2> =
         ? true
         : false;
 
-/** TODO(@@dd): remove Strict
- * Checks if (all properties of) T exists in _any_ element of the union
- * U = U_1 | ... | U_n, for n >= 0.
- * If Strict = true, then Is<U_k, T> is used for comparison, by default
- * Extends<U_k, T> is used, for k = 1, ..., n.
+/** ✅
+ * Checks if any element in the union U is assignable to T.
  *
- * T extends U_1 | U_2 is defined to be true if T extends U_1 or T extends U_2.
- * IsIn<T, U_1 | U_2> differs to T extends U_1 | U_2 in the following way:
- *
- * • Is<U_1, T> or Is<U_2, T> if Strict = true
- * • Extends<U_1, T> or Extends<U_2, T> if Strict = false
- *
- * Example use cases:
- *
- * • IsIn<T, U_1 | U_2 | U_3> is equivalent to
- *   Or<Extends<U_1, T>, Or<Extends<U_2, T>, Extends<U_3, T>>>
- * • IsIn<T, U_1 | U_2 | U_3, true> is equivalent to
- *   Or<Is<U_1, T>, Or<Is<U_2, T>, Is<U_3, T>>>
- * • Does not work for universal types, e.g.
- *   IsIn<T, any | unknown | never, true> fails and
- *   IsIn<any | unknown | never, T, true> fails.
- *   See IsUniveral<T> for a predicate that checks for universal types.
- *
- * @param T a non-empty union type
+ * @param T a union type
  * @param U the union to check against
- * @returns true if any element of the union U contains T
+ * @returns true if any element of the union U is assignable to T
  */
-export type IsIn<T, U, Strict extends boolean = false> =
-    Exists<T, UnionToTuple<U>, Strict>;
+export type IsIn<T, U> =
+    Exists<T, UnionToTuple<U>>;
 
-type Exists<T, U extends any[], Strict extends boolean> =
+type Exists<T, U extends any[]> =
     U extends [infer Head, ...infer Tail]
-        ? Strict extends true ? Is<Head, T> : Extends<Head, T> extends true ? true : Exists<T, Tail, Strict>
+        ? [Head] extends [T] ? true : Exists<T, Tail>
         : false;
 
-/** TODO(@@dd): remove Strict
- * Checks if (all properties of) T exists in _all_ elements of the union
- * U = U_1 | ... | U_n, for n >= 0.
- * If Strict = true, then Is<U_k, T> is used for comparison, by default
- * Extends<U_k, T> is used, for k = 1, ..., n.
+/** ✅
+ * Checks if each element in the union U is assignable to T.
  *
- * IsEeach<T, U_1 | U_2> checks:
- *
- * • Is<U_1, T> and Is<U_2, T> if Strict = true
- * • Extends<U_1, T> and Extends<U_2, T> if Strict = false
- *
- * Example use cases:
- *
- * • IsIn<T, U_1 | U_2 | U_3> is equivalent to
- *   And<Extends<U_1, T>, And<Extends<U_2, T>, Extends<U_3, T>>>
- * • IsIn<T, U_1 | U_2 | U_3, true> is equivalent to
- *   And<Is<U_1, T>, And<Is<U_2, T>, Is<U_3, T>>>
- *
- * @param T a non-empty union type
+ * @param T a union type
  * @param U the union to check against
- * @returns true if all elements of the union U contain T
+ * @returns true if each element of the union U assignable to T
  */
-export type IsEach<T, U, Strict extends boolean = false> =
-    AllOf<T, UnionToTuple<U>, Strict>;
+export type IsEach<T, U> =
+    AllOf<T, UnionToTuple<U>>;
 
-type AllOf<T, U extends any[], Strict extends boolean> =
+type AllOf<T, U extends any[]> =
     U extends [infer Head, ...infer Tail]
-        ? Strict extends true ? Is<Head, T> : Extends<Head, T> extends true ? AllOf<T, Tail, Strict> : false
+        ? [Head] extends [T] ? AllOf<T, Tail> : false
         : true;
 
 /** ✅

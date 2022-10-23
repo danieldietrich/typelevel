@@ -121,6 +121,12 @@ import { And, Equals, Extends, Fn, Is, IsEmpty, IsIn, IsUniversal, Not, Obj, Or 
 
 }
 
+{ // IsEach
+
+    // TODO(@@dd)
+
+}
+
 { // IsEmpty
 
     { // IsEmpty<T> should work for universal types
