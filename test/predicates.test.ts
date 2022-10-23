@@ -37,6 +37,49 @@ import { And, Equals, Extends, Fn, Is, IsEmpty, IsIn, IsUniversal, Not, Obj, Or 
     assertType<Is<Not<boolean>, boolean>>();
 }
 
+{ // Equals
+
+    { // universal types
+        assertType<Is<Equals<any, any>, true>>();
+        assertType<Is<Equals<any, unknown>, true>>();
+        assertType<Is<Equals<unknown, unknown>, true>>();
+        assertType<Is<Equals<never, any>, false>>();
+        assertType<Is<Equals<never, unknown>, false>>();
+        assertType<Is<Equals<never, never>, true>>();
+    }
+
+    { // objects, arrays, classes and functions
+        class A {}
+        class B extends A { b = 1 }
+        assertType<Is<Equals<{}, { a: 1 }>, false>>();
+        assertType<Is<Equals<{ a: 1 }, { a: 1 }>, true>>();
+        assertType<Is<Equals<[], [1]>, false>>();
+        assertType<Is<Equals<[1], [1]>, true>>();
+        assertType<Is<Equals<() => 1, () => 2>, false>>();
+        assertType<Is<Equals<() => 1, () => 1>, true>>();
+        assertType<Is<Equals<A, A>, true>>();
+        assertType<Is<Equals<B, B>, true>>();
+        assertType<Is<Equals<A, B>, false>>();
+    }
+
+    { // simple types
+        assertType<Is<Equals<0, 1>, false>>();
+        assertType<Is<Equals<1, 1>, true>>();
+        assertType<Is<Equals<null, null>, true>>();
+        assertType<Is<Equals<undefined, undefined>, true>>();
+        assertType<Is<Equals<void, void>, true>>();
+    }
+
+    { // unions
+        assertType<Is<Equals<{ a: 1 } | { b: 2 }, { a: 1, b: 2 }>, false>>();
+    }
+
+    { // intersections
+        assertType<Is<Equals<{ a: 1 } & { b: 2 }, { a: 1, b: 2 }>, true>>();
+    }
+
+}
+
 { // IsIn
 
     interface A {

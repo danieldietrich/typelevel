@@ -35,7 +35,9 @@ export type Or<C1 extends boolean, C2 extends boolean> =
 export type Not<C extends boolean> =
     C extends true ? false : true;
 
-// returns true if T1 equals T2
+/** ✅
+ * returns true if T1 equals T2
+ */
 export type Equals<T1, T2> =
     And<Extends<T1, T2>, Extends<T2, T1>> extends true
         ? true
