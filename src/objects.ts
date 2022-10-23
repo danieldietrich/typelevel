@@ -151,7 +151,6 @@ export type Filter<T, V, C extends boolean = true> =
         T extends Obj ? FilterObj<T, V, C> :
             never;
 
-// TODO(@@dd): test if [K in keyof T] works for T in any | unknown | never
 type FilterObj<T, V, C extends boolean> =
     Pick<T, {
         [K in keyof T]-?: T[K] extends V
