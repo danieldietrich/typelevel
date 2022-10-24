@@ -327,4 +327,10 @@ import { Combine, Equals, Filter, Is, Keys, Not, Obj, Paths, Values } from "../s
         assertType<Is<Filter<UV, string>, []>>();
     }
 
+    { // Filter should not match any
+        type Actual = Filter<{ _: any }, never>;
+        type Expected = {};
+        assertType<Equals<Actual, Expected>>();
+    }
+
 }

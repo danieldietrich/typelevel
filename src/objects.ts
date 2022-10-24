@@ -4,7 +4,7 @@
  * terms of the MIT License, which is available in the project root.
  ******************************************************************************/
 
-import { Is, IsUniversal, Or } from "./predicates";
+import { Extends, Is, IsUniversal, Or } from "./predicates";
 import { UnionToIntersection } from "./utilities";
 
 /**
@@ -171,7 +171,7 @@ export type Filter<T, V, C extends boolean = true> =
 
 type FilterObj<T, V, C extends boolean> =
     Pick<T, {
-        [K in keyof T]-?: T[K] extends V
+        [K in keyof T]-?: Extends<T[K], V> extends true
             ? C extends true ? K : never
             : C extends true ? never : K
     }[keyof T]>;
@@ -179,7 +179,7 @@ type FilterObj<T, V, C extends boolean> =
 type FilterArray<A, V, C extends boolean> =
     A extends [] ? [] :
         A extends [infer H, ...infer T]
-            ? [H] extends [V]
+            ? Extends<H, V> extends true
                 ? C extends true ? [H, ...FilterArray<T, V, C>] : FilterArray<T, V, C>
                 : C extends true ? FilterArray<T, V, C> : [H, ...FilterArray<T, V, C>]
             : [];
