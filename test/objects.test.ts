@@ -208,6 +208,25 @@ import { Combine, Equals, Filter, Is, Keys, Not, Obj, Paths, Values } from "../s
         assertType<Equals<Actual, Expected>>();
     }
 
+    { // Should compute correct paths
+        type Actual = Paths<{
+            b: {
+                c: {
+                    d: never;
+                };
+                e: {
+                    f: never;
+                };
+            };
+        }>;
+        type Expected = {
+            'b.c.d': never,
+            'b.e.f': never
+        };
+        assertType<Is<Actual, Expected>>();
+
+    }
+
 }
 
 { // Filter
