@@ -17,6 +17,9 @@ import { And, Equals, Extends, Fn, Is, IsEach, IsEmpty, IsIn, IsUniversal, Not, 
     assertType<Is<And<true, boolean>, boolean>>();
     assertType<Is<And<false, boolean>, false>>();
     assertType<Is<And<boolean, boolean>, boolean>>();
+
+    assertType<Is<And<true | false, true>, true | false>>();
+    assertType<Is<And<true, true | false>, true | false>>();
 }
 
 { // Or
@@ -29,6 +32,9 @@ import { And, Equals, Extends, Fn, Is, IsEach, IsEmpty, IsIn, IsUniversal, Not, 
     assertType<Is<Or<true, boolean>, true>>();
     assertType<Is<Or<false, boolean>, boolean>>();
     assertType<Is<Or<boolean, boolean>, boolean>>();
+
+    assertType<Is<Or<true | false, false>, true | false>>();
+    assertType<Is<Or<false, true | false>, true | false>>();
 }
 
 { // Not
