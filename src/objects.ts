@@ -4,7 +4,7 @@
  * terms of the MIT License, which is available in the project root.
  ******************************************************************************/
 
-import { IsUniversal } from "./predicates";
+import { Is, IsUniversal, Or } from "./predicates";
 
 /**
  * Combines all properties of an intersection type A & B.
@@ -118,12 +118,16 @@ export type Paths<T> =
             : never;
 
 // currently symbol keys are not supported
-type TupledPaths<T extends Obj, K extends string | number = Exclude<keyof T, symbol>, V = T[K]> =
-            IsUniversal<V> extends true
-                ? [`${K}`, V]
-                : V extends Obj
-                    ? [`${K}.${TupledPaths<V>[0]}`, TupledPaths<V>[1]]
-                    : [`${K}`, V];
+type TupledPaths<T, K = keyof T> =
+            T extends Obj
+                ? K extends string | number
+                    ? IsUniversal<T[K]> extends true
+                        ? [`${K}`, T[K]]
+                        : T[K] extends Obj
+                            ? [`${K}.${TupledPaths<T[K]>[0]}`, TupledPaths<T[K]>[1]]
+                            : [`${K}`, T[K]]
+                    : never
+                : never;
 
 /**
  * Filters arrays and objects of type T by comparing their values with the given
