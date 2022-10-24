@@ -5,7 +5,7 @@
  ******************************************************************************/
 
 import { assertType } from "typelevel-assert";
-import { Combine, Equals, Filter, Is, Keys, Obj, Paths, Values } from "../src";
+import { Combine, Equals, Filter, Is, Keys, Not, Obj, Paths, Values } from "../src";
 
 { // Obj
 
@@ -129,7 +129,7 @@ import { Combine, Equals, Filter, Is, Keys, Obj, Paths, Values } from "../src";
 
     { // Combine should distribute union types
         type Actual = Combine<{ a: 1 } & { b: 1 } | { a: 2 } & { c: 2 }>;
-        type Expected = { a: 1; b: 1} | { a: 2; c: 2 };
+        type Expected = Combine<{ a: 1 } & { b: 1}> | Combine<{ a: 2 } & { c: 2 }>;
         assertType<Equals<Actual, Expected>>();
     }
 
@@ -257,16 +257,42 @@ import { Combine, Equals, Filter, Is, Keys, Obj, Paths, Values } from "../src";
         assertType<Equals<Actual, Expected>>();
     }
 
-    { // Filter not should distribute a union of selectors when filtering an object
+    { // Filter should distribute a union of selectors and combine their results when filtering an object
         type Actual = Filter<O, number | string>;
-        type Expected = { a: 1, b: '' };
+        type Expected = Filter<O, number> & Filter<O, string>; // obj is a monoid wrt combine '&'
         assertType<Equals<Actual, Expected>>();
+        assertType<Is<Filter<O, number>, { a: 1 }>>();
+        assertType<Is<Filter<O, string>, { b: '' }>>();
+        assertType<Is<Filter<O, number | string>, { a: 1, b: '' }>>();
     }
 
-    { // Filter not should distribute a union of selectors when filtering an array
+    { // Filter should distribute a union of selectors and combine their results when filtering an array
         type Actual = Filter<A, number | string>;
-        type Expected = [1, '']
+        type Expected = [...Filter<A, number>, ...Filter<A, string>]; // array is a monoid wrt concat
         assertType<Equals<Actual, Expected>>();
+        assertType<Is<Filter<A, number>, [1]>>();
+        assertType<Is<Filter<A, string>, ['']>>();
+        assertType<Is<Filter<A, number | string>, [1, '']>>();
+    }
+
+    { // Filter should not distribute object union values
+        type UV = {
+            a: number | string
+        }
+        type Actual = Filter<UV, number | string>;
+        type Expected = Filter<UV, number> | Filter<UV, string>;
+        assertType<Not<Equals<Actual, Expected>>>();
+        assertType<Is<Filter<UV, number>, {}>>();
+        assertType<Is<Filter<UV, string>, {}>>();
+    }
+
+    { // Filter should not distribute array union values
+        type UV = [number | string]
+        type Actual = Filter<UV, number | string>;
+        type Expected = [number] | [string];
+        assertType<Not<Equals<Actual, Expected>>>();
+        assertType<Is<Filter<UV, number>, []>>();
+        assertType<Is<Filter<UV, string>, []>>();
     }
 
 }
