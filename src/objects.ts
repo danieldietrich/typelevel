@@ -4,7 +4,8 @@
  * terms of the MIT License, which is available in the project root.
  ******************************************************************************/
 
-import { IsUniversal } from "./predicates";
+import { Is, IsUniversal, Or } from "./predicates";
+import { UnionToIntersection } from "./utilities";
 
 /**
  * Combines all properties of an intersection type A & B.
@@ -113,21 +114,34 @@ export type Values<T> = T[keyof T];
  * @returns a union of flattened objects
  */
 export type Paths<T> =
-        T extends Obj
-            ? { [K in `${TupledPaths<T>[0]}`]: TupledPaths<T>[1] }
+    Or<Is<T, {}>, IsUniversal<T>> extends true
+        ? T
+        : T extends Obj
+            ? Combine<UnionToIntersection<_Paths<T>>>
             : never;
 
+type _Paths<T extends Obj> =
+    TupledPaths<T> extends infer P
+        ? P extends [string, unknown]
+            ? { [K in `${P[0]}`]: P[1] }
+            : never
+        : never;
+
 // currently symbol keys are not supported
-type TupledPaths<T, K = keyof T> =
-            T extends Obj
-                ? K extends string | number
-                    ? IsUniversal<T[K]> extends true
-                        ? [`${K}`, T[K]]
-                        : T[K] extends Obj
-                            ? [`${K}.${TupledPaths<T[K]>[0]}`, TupledPaths<T[K]>[1]]
-                            : [`${K}`, T[K]]
-                    : never
-                : never;
+type TupledPaths<T, K = Keys<T>> =
+    T extends Obj
+        ? K extends string | number
+            ? IsUniversal<T[K]> extends true
+                ? [`${K}`, T[K]]
+                : T[K] extends Record<string | number, unknown>
+                    ? TupledPaths<T[K]> extends infer F
+                        ? F extends [string, unknown]
+                            ? [`${K}.${F[0]}`, F[1]]
+                            : never
+                        : never
+                    : [`${K}`, T[K]]
+            : never
+        : never;
 
 /**
  * Filters arrays and objects of type T by comparing their values with the given
