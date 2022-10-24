@@ -4,82 +4,164 @@
  * terms of the MIT License, which is available in the project root.
  ******************************************************************************/
 
-import { Is, Or } from "./predicates";
-import { UnionToIntersection } from "./utilities";
+import { IsUniversal } from "./predicates";
 
 /**
- * A type with a set of properties PropertyKey of type unknown.
- * Classes, arrays, functions and primitives are not of this
+ * Combines all properties of an intersection type A & B.
+ * Combine does not differ from the built-in type A & B.
+ *
+ * Combine distributes union types.
+ *
+ * @param T a union of intersections
+ * @returns a union of combined types
+ */
+export type Combine<T> = { [K in (keyof T)]: T[K] };
+
+/**
+ * Obj represents a type with a set of properties. Obj is syntactic sugar for
+ * Record<PropertyKey, unknown>, while the TS build-it object has the form
+ * Record<PropertyKey, any>.
+ *
+ * Obj does not match interfaces or classes because they are possible target
+ * for declaration merging, their properties are not fully known.
+ *
+ * | T                  | T extends Obj  | T extends object  |
+ * | ================== | ============== | ================= |
+ * | any                | boolean        | boolean           |
+ * | unknown            | false          | false             |
+ * | never              | true           | true              |
+ * | ------------------ | -------------- | ----------------- |
+ * | interface {}       | false          | true              |
+ * | interface { k: V } | false          | true              |
+ * | class {}           | false          | true              |
+ * | class { k: V }     | false          | true              |
+ * | {}                 | true           | true              |
+ * | { k: V }           | true           | true              |
+ * | []                 | false          | true              |
+ * | [number]           | false          | true              |
+ * | () => void         | false          | true              |
+ * | ------------------ | -------------- | ----------------- |
+ * | string             | false          | false             |
+ * | number             | false          | false             |
+ * | boolean            | false          | false             |
+ * | symbol             | false          | false             |
+ * | bigint             | false          | false             |
+ * | null               | false          | false             |
+ * | undefined          | false          | false             |
+ * | void               | false          | false             |
+ *
+ * See https://github.com/microsoft/TypeScript/issues/42825#issuecomment-780873604
  */
 export type Obj = Record<PropertyKey, unknown>;
 
 /**
- * Good alternative to keyof T if users want to get rid of special handling of T in any | never at the use-site.
+ * Convenience type alias for keyof T, with a fix for one common mistake:
+ *
+ *    { [x in keyof any]: any }
+ *  = { [x: string]: any }
+ * != { [x: string]: any; [x: number]: any; [x: symbol]: never }
+ *  = { [_ in (keyof any)]: any }
+ *  = { [_ in Keys<T>]: any }
+ *
+ * Keys does not distribute union types.
+ *
  * @param T a type
- * @returns keyof T, never if any/unknown/never
+ * @returns keyof T
  */
-export type Keys<T> =
-    Or<Is<T, any>, Is<T, never>> extends true ? never : keyof T;
+export type Keys<T> = keyof T;
 
 /**
  * Syntactic sugar for T[keyof T].
- * @returns T[keyof T], [any, unknown, never] => [any, never, never]
+ *
+ * Values does not distribute union types.
+ *
+ * @param T a type
+ * @returns T[keyof T], where Values<any> = any, Values<unknown> = Values<never> = never
  */
 export type Values<T> = T[keyof T];
 
-// deep-flattens the keys
-export type Paths<T, P = TupledPaths<T>> =
-    // TODO(@@dd): write `Exists<any | unknown | never | {}, T> extends true` instead
-    Or<Is<T, {}>, Or<Is<T, any>, Or<Is<T, unknown>, Is<T, never>>>> extends true
-        ? T
-        : P extends [string, unknown]
-            ? { [K in `${P[0]}`]: P[1] }
+/**
+ * Deep-flattens object keys by recursively traversing the type structure and
+ * concatenating all keys with dot '.'.
+ *
+ * { a: { b: { c: number } } } => { 'a.b.c': number }
+ *
+ * Paths intentionally only traverses types of shape Obj = Record<PropertyKey, unknown>.
+ * Interfaces, classes and arrays are seen as leafs. Currently Paths uses
+ * string literal types under the hood to concatenate keys. This is why only
+ * keys in string | number are supported, symbols are ignored.
+ *
+ * | T                   | Paths<T>                 |
+ * | =================== | ======================== |
+ * | any                 | { [x: string]: any }     |
+ * | unknown             | never                    |
+ * | never               | never                    |
+ * | ------------------- | ------------------------ |
+ * | {}                  | {}                       |
+ * | { a: { b: 1 } }     | { 'a.b': 1 }             |
+ * | { a: 1 } | { b: 2 } | { 'a': 1 } | { 'b': 2 }  |
+ * | ------------------- | ------------------------ |
+ * | <arrays>            | never                    |
+ * | <classes>           | never                    |
+ * | <interfaces>        | never                    |
+ * | <functions>         | never                    |
+ * | <other-types>       | never                    |
+ *
+ * Paths distributes union types.
+ *
+ * @param T a union type
+ * @returns a union of flattened objects
+ */
+export type Paths<T> =
+        T extends Obj
+            ? { [K in `${TupledPaths<T>[0]}`]: TupledPaths<T>[1] }
             : never;
 
 // currently symbol keys are not supported
-type TupledPaths<T, K = Keys<T>> =
-    T extends Obj
-        ? K extends string | number
-            ? Or<Is<T[K], any>, Is<T[K], never>> extends true
-                ? [`${K}`, T[K]]
-                : T[K] extends Record<string | number, unknown>
-                    ? TupledPaths<T[K]> extends infer F
-                        ? F extends [string, unknown]
-                            ? [`${K}.${F[0]}`, F[1]]
-                            : never
-                        : never
-                    : [`${K}`, T[K]]
-            : never
-        : never;
+type TupledPaths<T extends Obj, K extends string | number = Exclude<keyof T, symbol>, V = T[K]> =
+            IsUniversal<V> extends true
+                ? [`${K}`, V]
+                : V extends Obj
+                    ? [`${K}.${TupledPaths<V>[0]}`, TupledPaths<V>[1]]
+                    : [`${K}`, V];
 
-// Map preserves union results
-export type Map<T = any, R = unknown> = [unknown] extends [T] ? unknown : R;
-
-// FlatMap distributes a union and flattens the result
-export type FlatMap<T = any, R = unknown> = Flatten<Map<T, R>>;
-
-// Flattens union types
-export type Flatten<T extends Map> = Join<UnionToIntersection<T>>;
-
-// Merges all properties of an intersection type A & B
-export type Join<T> = T extends Obj ? { [K in Keys<T>]:  T[K] } : T;
-
-// TODO(@@dd): test this for T in any | unknown | never
-export type Filter<T, V, Condition extends boolean = true> =
-    T extends any[] ? FilterArray<T, V, Condition> :
-        T extends Obj ? FilterObj<T, V, Condition> :
+/**
+ * Filters arrays and objects of type T by comparing their values with the given
+ * union type V. A value is part of the result, if it is assignable to V.
+ *
+ * | T        |  V       | Filter<T, V>                 |
+ * | ======== | ======== | ============================ |
+ * | { a: 1 } | any      | T                            |
+ * | { a: 1 } | unknown  | T                            |
+ * | { a: 1 } | never    | {}                           |
+ * | -------- | -------- | ---------------------------- |
+ * | [1]      | any      | T                            |
+ * | [1]      | unknown  | T                            |
+ * | [1]      | never    | []                           |
+ * | -------- | -------- | ---------------------------- |
+ * | A \| B   | V        | Filter<A, V> \| Filter<B, V> |
+ *
+ * @param T a union of arrays and objects (distributed)
+ * @param V a union of types that will be compared to the values of T (non-distributed)
+ * @param C a boolean condition which negates the filter, if false
+ * @returrns a filtered version of T or never
+ */
+export type Filter<T, V, C extends boolean = true> =
+    T extends any[] ? FilterArray<T, V, C> :
+        T extends Obj ? FilterObj<T, V, C> :
             never;
 
-// TODO(@@dd): test if [K in keyof T] works for T in any | unknown | never
-type FilterObj<T, V, Condition extends boolean> = Pick<T, { [K in keyof T]-?: T[K] extends V
-    ? Condition extends true ? K : never
-    : Condition extends true ? never : K
-}[Keys<T>]>;
+type FilterObj<T, V, C extends boolean> =
+    Pick<T, {
+        [K in keyof T]-?: T[K] extends V
+            ? C extends true ? K : never
+            : C extends true ? never : K
+    }[keyof T]>;
 
-type FilterArray<A extends any[], V, Condition extends boolean> =
+type FilterArray<A, V, C extends boolean> =
     A extends [] ? [] :
         A extends [infer H, ...infer T]
-            ? H extends V
-                ? Condition extends true ? [H, ...FilterArray<T, V, Condition>] : FilterArray<T, V, Condition>
-                : Condition extends true ? FilterArray<T, V, Condition> : [H, ...FilterArray<T, V, Condition>]
+            ? [H] extends [V]
+                ? C extends true ? [H, ...FilterArray<T, V, C>] : FilterArray<T, V, C>
+                : C extends true ? FilterArray<T, V, C> : [H, ...FilterArray<T, V, C>]
             : [];
