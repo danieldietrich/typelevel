@@ -138,10 +138,12 @@ import { Combine, Equals, Filter, Is, Keys, Not, Obj, Paths, Values } from "../s
 { // Paths
 
     { // Paths should work for universal types T = any | unknown | never
-        assertType<Is<Paths<any>, { [x: string]: any }>>();
+        assertType<Is<Paths<any>, any>>();
+        assertType<Is<Paths<unknown>, unknown>>();
         assertType<Is<Paths<never>, never>>();
-        assertType<Is<Paths<unknown>, never>>();
     }
+
+    type T = Paths<boolean>;
 
     { // Paths should handle primitive types
         assertType<Is<Paths<boolean>, never>>();
@@ -208,7 +210,19 @@ import { Combine, Equals, Filter, Is, Keys, Not, Obj, Paths, Values } from "../s
         assertType<Equals<Actual, Expected>>();
     }
 
-    { // Should compute correct paths
+    { // Paths should work for flat objects
+        type Actual= Paths<{
+            a: number;
+            b: never;
+        }>;
+        type Expected = {
+            a: number;
+            b: never;
+        };
+        assertType<Is<Actual, Expected>>();
+    }
+
+    { // Paths should work for deep objects
         type Actual = Paths<{
             b: {
                 c: {
@@ -220,11 +234,10 @@ import { Combine, Equals, Filter, Is, Keys, Not, Obj, Paths, Values } from "../s
             };
         }>;
         type Expected = {
-            'b.c.d': never,
-            'b.e.f': never
+            'b.c.d': never;
+            'b.e.f': never;
         };
         assertType<Is<Actual, Expected>>();
-
     }
 
 }
