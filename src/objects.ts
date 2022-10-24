@@ -4,7 +4,7 @@
  * terms of the MIT License, which is available in the project root.
  ******************************************************************************/
 
-import { Is, IsUniversal, Or } from "./predicates";
+import { IsUniversal } from "./predicates";
 
 /**
  * Combines all properties of an intersection type A & B.
