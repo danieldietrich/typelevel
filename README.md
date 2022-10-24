@@ -1,5 +1,3 @@
-# ⚠️ BEWARE! THE API IS STILL UNSTABLE AND WILL CHANGE!
-
 <div id="typelevel-logo" align="center">
   <img alt="TypeLevel Logo Dark Mode" src="https://user-images.githubusercontent.com/743833/196892454-19e7eb18-7434-46de-a476-d39606507692.png#gh-dark-mode-only" width=640>
   <img alt="TypeLevel Logo Light Mode" src="https://user-images.githubusercontent.com/743833/196917074-f23107b9-c408-4267-9ab1-e0964fb576ba.png#gh-light-mode-only" width=640>
