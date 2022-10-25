@@ -34,21 +34,178 @@ Install <tt>**&lt;TypeLevel>**</tt>
 npm i -D typescript-typelevel
 ```
 
-Visit [typelevel.io](https://typelevel.io) to learn more...
+## Features
 
-## Example
+### Functions
 
-<div>
-  This is a typical unit test with a <strong>type assertion</strong> imported from our companion project <a alt="typelevel-assert link" href="https://github.com/danieldietrich/typelevel-assert">typelevel-assert</a>. The <strong>assertType&lt;T></strong> utility has a generic type parameter <strong>T</strong> of type <strong>true</strong> <em>(yes, true is a type on its own in TypeScript)</em>. If a type instance of the parameter <strong>T</strong> is <strong>false</strong>, the compiler issues an error.
-  <img width="786" alt="ginject-assert-type-0-test" src="https://user-images.githubusercontent.com/743833/196083451-de0c3220-10a7-4ee1-95d8-77ea7bc38833.png">
-</div>
+| Type                                               |
+| -------------------------------------------------- |
+| `Fn<A extends any[] = any[], R extends any = any>` | 
 
-<div>
-  In the test above, we use the <strong>Is</strong> utility to check if the <strong>Actual</strong> type is exactly the same as the <strong>Expected</strong> type. If the expectation is not met, we need to investigate the <strong>Actual</strong> type.
-  <img width="654" alt="ginject-assert-type-2-expected" src="https://user-images.githubusercontent.com/743833/196084831-e3707df1-c8ad-42e2-8c27-93c482f362b3.png">
-</div>
+### Objects
 
-<div>
-  <img align="right"width="458" alt="ginject-assert-type-1-actual" src="https://user-images.githubusercontent.com/743833/196082745-89c5bcc3-5862-457e-8930-7d419202237c.png">
-  The <strong>Actual</strong> type looks weired. The <strong>cause</strong> of the <strong>ValidationError</strong> is <strong>[string, number, symbol]</strong>. This is a smell. TypeScript's <strong>PropertyKey</strong> union type seems to leak into a type computation. Something worth to look at...
-</div>
+| Type                                     |
+| ---------------------------------------- |
+| `Combine<T>`                             |
+| `Filter<T, V, C extends boolean = true>` |
+| `Obj`                                    |
+| `Paths<T>`                               |
+| `Keys<T>`                                |
+| `Values<T>`                              |
+
+### Predicates
+
+| Type                                          |
+| --------------------------------------------- |
+| `And<C1 extends boolean, C2 extends boolean>` |
+| `Or<C1 extends boolean, C2 extends boolean>`  |
+| `Not<C extends boolean>`                      |
+| `Equals<T1, T2>`                              |
+| `Extends<T1, T2>`                             |
+| `Is<T1, T2>`                                  |
+| `IsIn<T, U>`                                  |
+| `IsEach<T, U>`                                |
+| `IsEmpty<T>`                                  |
+| `IsUniversal<T>`                              |
+
+### Utilities
+
+| Type                                   |
+| -------------------------------------- |
+| `TupleToIntersection<T extends any[]>` |
+| `TupleToUnion<T extends any[]>`        |
+| `UnionToIntersection<U>`               |
+| `UnionToTuple<T>`                      |
+
+### Type Checker
+
+| Type                                                 |
+| ---------------------------------------------------- |
+| `CheckError<Message = any, Cause = any, Help = any>` |
+| `CheckResult<T, E extends (T \| CheckError)[], K extends PropertyKey = 'typelevel_error'>` |
+
+## The Essence of TypeScript
+
+JavaScript (JS) is a structurally typed language. Informally, two types are assignable (read: considered "equal"), if they share the same properties. JS is dynamically typed, errors are reported at runtime.
+
+TypeScript (TS) adds a static type system on top of JS, we say TS is a superset of JS. In fact, the essence of TS's type system is very simple, it consits of a set of built-in types and operations for type composition.
+
+### Declaring types
+
+* `type` a type alias that does not change
+* `interface` a type that may be extended
+* `class` a JS class type
+* `enum` an enumeration
+
+### [Built-in types](https://www.typescriptlang.org/docs/handbook/2/everyday-types.html)
+
+* `{}` indexed arrays aka 'objects'
+* `[]` arrays and tuples
+* `() => T` functions
+* `string`, `number`, `boolean`, `bigint`, `symbol`, `undefined`, `null` primitive types
+* `'abc'`, `1`, `true`, ... literal types
+* `void` absence of any type
+* `any`, `unknown`, `never` universal types
+
+### Universal types
+
+`any` and `unknown` are both at the top of the type hierarchy, every type extends them. Informally, they can be seen as union of all possible types. However, technically they are no union types.
+
+`unknown` is the neutral element of the type intersection `&` operation.
+
+```ts
+A & unknown = A
+A & any = any
+```
+
+`any` and `unknown` have different meanings. `any` is treated as any type to make the compiler happy at the cost of opting-out of type checking. `unknown` is similar to `any` while staying type-safe.
+
+`never` is at the bottom of the type hierarchy, it can be seen as subtype of all existing types, a type that will never occur.
+
+`never` is the empty union and the neutral element of the type union `|` operation.
+
+```ts
+A | never = A
+```
+
+Hint on matching objects:
+
+* `Record<PropertyType, unknown>` matches indexed arrays
+* `Record<PropertyType, any>` matches all types with an index structure, like objects, arrays, functions, interfaces and classes
+
+### Composing Types
+
+[Union and intersection](https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#union-types):
+
+* `T | U` union type, neutral element `never` (the "empty union")
+* `T & U` intersection type, neutral element `unknown`
+
+[Derive types from types](https://www.typescriptlang.org/docs/handbook/2/types-from-types.html):
+
+* `T<U>` [generic type](https://www.typescriptlang.org/docs/handbook/2/generics.html)
+* `keyof T` [keyof operator](https://www.typescriptlang.org/docs/handbook/2/keyof-types.html)
+* `T['prop']` [indexed access type](https://www.typescriptlang.org/docs/handbook/2/indexed-access-types.html)
+* `` `..${T}..` ``</code> [template literal type](https://www.typescriptlang.org/docs/handbook/2/template-literal-types.html)
+* `{ [K in keyof T]: U }` [mapped type](https://www.typescriptlang.org/docs/handbook/2/mapped-types.html)
+* `T extends U ? V : W` [conditional type](https://www.typescriptlang.org/docs/handbook/2/conditional-types.html)
+* `T extends infer U ? V : W` [inferred type]()
+
+_Note: [`typeof`](https://www.typescriptlang.org/docs/handbook/2/typeof-types.html) was intentionally not mentioned because it does not operate on the type level._
+
+### Type Distribution
+
+One of the most important concepts in TS is the [distribution of union types over conditional types](https://www.typescriptlang.org/docs/handbook/2/conditional-types.html#distributive-conditional-types).
+
+_This [Stack Overflow answer](https://stackoverflow.com/questions/62084836/what-does-it-mean-for-a-type-to-distribute-over-unions) by [Karol Majewski
+](https://stackoverflow.com/users/10325032/karol-majewski) describes it best:_
+
+> The term _distributive_ refers to how union types should be treated when subjected to type-level operations (such as `keyof` or mapped types).
+>
+> * **Non-distributive (default)** operations are applied to properties that exist on every member of the union.
+> * **Distributive** operations are applied to _all members_ of the union separately.
+>
+> Let's use an example.
+>
+> ```ts
+> type Fruit =
+>   | { species: 'banana', curvature: number }
+>   | { species: 'apple', color: string }
+> ```
+>
+> Let's assume that, for some reason, you want to know all possible keys that can exist on a `Fruit`.
+>
+> **Non-distributive**
+>
+> Your intuition may tell you to do:
+>
+> ```ts
+> type KeyOfFruit = keyof Fruit; // "species"
+> ```
+>
+> However, this will give you only the properties that exist on every member of the union. In our example, `species` is the only common property shared by all `Fruit`.
+>
+> It's the same as applying `keyof` to the union of the two types.
+>
+> ```ts
+> keyof ({ species: 'banana', curvature: number } | { species: 'apple', color: string })
+> ```
+>
+> **Distributive**
+>
+> With distribution, the operation is not performed on _just_ the common properties. Instead, it is done on _every member of the union separately_. The results are then added together.
+>
+> ```ts
+> type DistributedKeyOf<T> =
+>   T extends any
+>     ? keyof T
+>     : never
+>
+> type KeyOfFruit = DistributedKeyOf<Fruit>; // "species" | "curvature" | "color"
+> ```
+>
+> In this case, TypeScript applied `keyof` to each member of the union, and summed the results.
+>
+> ```ts
+> keyof { species: 'banana', curvature: number } | keyof { species: 'apple', color: string }
+> ```
+
