@@ -7,6 +7,15 @@
 import { Filter } from "./objects";
 
 /**
+ * A successful check of type T is T, otherwise a CheckError that describes the
+ * check failure.
+ *
+ * @param T a type
+ * @returns T or a CheckError
+ */
+export type Check<T> = (T | CheckError);
+
+/**
  * Represents a check result of type T. If all checks C pass, T is returned,
  * otherwise an error with a list of failed checks is returned
  *
@@ -21,8 +30,8 @@ import { Filter } from "./objects";
  * @param K optional property key of an error, by default 'typelevel_error'
  * @returns T if all checks succeeded, otherwise { K: CheckError[] }
  */
-export type CheckResult<T, E extends (T | CheckError)[], K extends PropertyKey = 'typelevel_error'> =
-    Filter<E, CheckError> extends infer C
+export type CheckResult<T, C extends Check<T>[], K extends PropertyKey = 'typelevel_error'> =
+    Filter<C, CheckError> extends infer C
         ? C extends []
             ? T
             : { [Key in K]: C }
