@@ -46,12 +46,12 @@ npm i -D typescript-typelevel
 
 | Type                                     |
 | ---------------------------------------- |
-| `Combine<T>`                             |
-| `Filter<T, V, C extends boolean = true>` |
 | `Obj`                                    |
-| `Paths<T>`                               |
 | `Keys<T>`                                |
 | `Values<T>`                              |
+| `Paths<T>`                               |
+| `Combine<T>`                             |
+| `Filter<T, V, C extends boolean = true>` |
 
 ### Predicates
 
@@ -209,4 +209,3 @@ _This [Stack Overflow answer](https://stackoverflow.com/questions/62084836/what-
 > ```ts
 > keyof { species: 'banana', curvature: number } | keyof { species: 'apple', color: string }
 > ```
-
