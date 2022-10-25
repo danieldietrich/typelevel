@@ -7,13 +7,13 @@
 import { Filter } from "./objects";
 
 /**
- * A successful check of type T is T, otherwise a CheckError that describes the
- * check failure.
+ * Represents a check of type T. Passes through T if the check is a success,
+ * returns a CheckError in the case of a failure.
  *
  * @param T a type
  * @returns T or a CheckError
  */
-export type Check<T> = (T | CheckError);
+export type Check<T> = T | CheckError;
 
 /**
  * Represents a check result of type T. If all checks C pass, T is returned,
