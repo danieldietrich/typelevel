@@ -81,8 +81,9 @@ npm i -D typescript-typelevel
 
 | Type                                                 |
 | ---------------------------------------------------- |
+| `Check<T>`                                           |
 | `CheckError<Message = any, Cause = any, Help = any>` |
-| `CheckResult<T, E extends (T \| CheckError)[], K extends PropertyKey = 'typelevel_error'>` |
+| `CheckResult<T, C extends Check<T>[], K extends PropertyKey = 'typelevel_error'>` |
 
 ## The Essence of TypeScript
 
