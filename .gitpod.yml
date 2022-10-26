@@ -1,6 +1,5 @@
 tasks:
   - init: npm i
-    command: npm run watch
 
 vscode:
   extensions:
