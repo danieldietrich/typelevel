@@ -75,7 +75,7 @@ npm i -D typescript-typelevel
 | `TupleToIntersection<T extends any[]>` |
 | `TupleToUnion<T extends any[]>`        |
 | `UnionToIntersection<U>`               |
-| `UnionToTuple<T>`                      |
+| `UnionToTuple<T>` ⚠️                   |
 
 ### Type Checker
 
