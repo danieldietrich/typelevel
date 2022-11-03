@@ -8,8 +8,9 @@
  * Represents a function type with a variable number of arguments and a return type.
  *
  * Examples:
- * • A function with exactly one parameter: Fn<[infer First], infer R>
- * • A function with at least one parameters: Fn<[infer First, ...infer Rest], infer R>
+ * • A function: Fn
+ * • A function with exactly one parameter First and arbitrary return type: Fn<[infer First]>
+ * • A function with at least one parameters First and a specific return type R: Fn<[infer First, ...infer Rest], infer R>
  *
  * @param A - an array of argument types, default any[]
  * @param R - the return type, default any
