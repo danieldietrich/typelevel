@@ -31,10 +31,10 @@ export type Check<T> = T | CheckError;
  * @returns T if all checks succeeded, otherwise { K: CheckError[] }
  */
 export type CheckResult<T, C extends Check<T>[], K extends PropertyKey = 'typelevel_error'> =
-    Filter<C, CheckError> extends infer C
-        ? C extends []
+    Filter<C, CheckError> extends infer E
+        ? E extends []
             ? T
-            : { [Key in K]: C }
+            : { [Key in K]: E }
         : never;
 
 /**
