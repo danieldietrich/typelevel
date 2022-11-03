@@ -9,7 +9,8 @@ import { UnionToIntersection } from "./utilities";
 
 /**
  * Combines all properties of an intersection type A & B.
- * Combine does not differ from the built-in type A & B.
+ *
+ * Combine<{ a: number } & { b: string }> = { a: number, b: string }
  *
  * Combine distributes union types.
  *
@@ -19,37 +20,42 @@ import { UnionToIntersection } from "./utilities";
 export type Combine<T> = { [K in (keyof T)]: T[K] };
 
 /**
- * Obj represents a type with a set of properties. Obj is syntactic sugar for
- * Record<PropertyKey, unknown>, while the TS build-it object has the form
- * Record<PropertyKey, any>.
+ * Obj represents an object literal type. Obj is syntactic sugar for
+ * Record<PropertyKey, unknown>.
+ *
+ * TypeScript has the following built-in types to match objects:
+ *
+ * • Record<PropertyKey, unknown> any object literal type { ... } with an index structure
+ * • Record<PropertyKey, any> like Record<PropertyKey, unknown> but also interfaces, classes, arrays and functions
+ * • Object any value (primitive, non-primitive)
+ * • object any non-primitive type, same as Record<PropertyKey, any> but no index structure
+ * • {} empty object, any non-nullish value
  *
  * Obj does not match interfaces or classes because they are possible target
  * for declaration merging, their properties are not fully known.
  *
- * | T                  | T extends Obj  | T extends object  |
- * | ================== | ============== | ================= |
- * | any                | boolean        | boolean           |
- * | unknown            | false          | false             |
- * | never              | true           | true              |
- * | ------------------ | -------------- | ----------------- |
- * | interface {}       | false          | true              |
- * | interface { k: V } | false          | true              |
- * | class {}           | false          | true              |
- * | class { k: V }     | false          | true              |
- * | {}                 | true           | true              |
- * | { k: V }           | true           | true              |
- * | []                 | false          | true              |
- * | [number]           | false          | true              |
- * | () => void         | false          | true              |
- * | ------------------ | -------------- | ----------------- |
- * | string             | false          | false             |
- * | number             | false          | false             |
- * | boolean            | false          | false             |
- * | symbol             | false          | false             |
- * | bigint             | false          | false             |
- * | null               | false          | false             |
- * | undefined          | false          | false             |
- * | void               | false          | false             |
+ * | T                  | T extends Obj = Record<PropertyKey, unknown> | T extends Record<PropertyKey, any> | T extends object  | T extends Object  | T extends {} |
+ * | ------------------ | ------- | ------- | ------- | ------- | ------- |
+ * | any                | boolean | boolean | boolean | boolean | boolean |
+ * | unknown            | false   | false   | false   | false   | false   |
+ * | never              | true    | true    | true    | true    | true    |
+ * | {}                 | true    | true    | true    | true    | true    |
+ * | { k: V }           | true    | true    | true    | true    | true    |
+ * | interface {}       | false   | true    | true    | true    | true    |
+ * | interface { k: V } | false   | true    | true    | true    | true    |
+ * | class {}           | false   | true    | true    | true    | true    |
+ * | class { k: V }     | false   | true    | true    | true    | true    |
+ * | []                 | false   | true    | true    | true    | true    |
+ * | [number]           | false   | true    | true    | true    | true    |
+ * | () => void         | false   | true    | true    | true    | true    |
+ * | string             | false   | false   | false   | true    | true    |
+ * | number             | false   | false   | false   | true    | true    |
+ * | boolean            | false   | false   | false   | true    | true    |
+ * | symbol             | false   | false   | false   | true    | true    |
+ * | bigint             | false   | false   | false   | true    | true    |
+ * | null               | false   | false   | false   | false   | false   |
+ * | undefined          | false   | false   | false   | false   | false   |
+ * | void               | false   | false   | false   | false   | false   |
  *
  * See https://github.com/microsoft/TypeScript/issues/42825#issuecomment-780873604
  */
@@ -92,21 +98,19 @@ export type Values<T> = T[keyof T];
  * string literal types under the hood to concatenate keys. This is why only
  * keys in string | number are supported, symbols are ignored.
  *
- * | T                   | Paths<T>                 |
- * | =================== | ======================== |
- * | any                 | { [x: string]: any }     |
- * | unknown             | never                    |
- * | never               | never                    |
- * | ------------------- | ------------------------ |
- * | {}                  | {}                       |
- * | { a: { b: 1 } }     | { 'a.b': 1 }             |
- * | { a: 1 } | { b: 2 } | { 'a': 1 } | { 'b': 2 }  |
- * | ------------------- | ------------------------ |
- * | <arrays>            | never                    |
- * | <classes>           | never                    |
- * | <interfaces>        | never                    |
- * | <functions>         | never                    |
- * | <other-types>       | never                    |
+ * | T                    | Paths<T>                  |
+ * | -------------------- | ------------------------- |
+ * | any                  | { [x: string]: any }      |
+ * | unknown              | never                     |
+ * | never                | never                     |
+ * | {}                   | {}                        |
+ * | { a: { b: 1 } }      | { 'a.b': 1 }              |
+ * | { a: 1 } \| { b: 2 } | { 'a': 1 } \| { 'b': 2 }  |
+ * | arrays               | supported                 |
+ * | classes              | supported                 |
+ * | interfaces           | supported                 |
+ * | functions            | supported                 |
+ * | other-types          | never                     |
  *
  * Paths distributes union types.
  *
@@ -116,11 +120,11 @@ export type Values<T> = T[keyof T];
 export type Paths<T> =
     Or<Is<T, {}>, IsUniversal<T>> extends true
         ? T
-        : T extends Obj
+        : T extends Record<PropertyKey, any>
             ? Combine<UnionToIntersection<_Paths<T>>>
             : never;
 
-type _Paths<T extends Obj> =
+type _Paths<T> =
     TupledPaths<T> extends infer P
         ? P extends [string, unknown]
             ? { [K in `${P[0]}`]: P[1] }
@@ -129,7 +133,7 @@ type _Paths<T extends Obj> =
 
 // currently symbol keys are not supported
 type TupledPaths<T, K = Keys<T>> =
-    T extends Obj
+    T extends Record<PropertyKey, any>
         ? K extends string | number
             ? IsUniversal<T[K]> extends true
                 ? [`${K}`, T[K]]
@@ -148,15 +152,13 @@ type TupledPaths<T, K = Keys<T>> =
  * union type V. A value is part of the result, if it is assignable to V.
  *
  * | T        |  V       | Filter<T, V>                 |
- * | ======== | ======== | ============================ |
+ * | -------- | -------- | ---------------------------- |
  * | { a: 1 } | any      | T                            |
  * | { a: 1 } | unknown  | T                            |
  * | { a: 1 } | never    | {}                           |
- * | -------- | -------- | ---------------------------- |
  * | [1]      | any      | T                            |
  * | [1]      | unknown  | T                            |
  * | [1]      | never    | []                           |
- * | -------- | -------- | ---------------------------- |
  * | A \| B   | V        | Filter<A, V> \| Filter<B, V> |
  *
  * @param T a union of arrays and objects (distributed)
@@ -166,7 +168,7 @@ type TupledPaths<T, K = Keys<T>> =
  */
 export type Filter<T, V, C extends boolean = true> =
     T extends any[] ? FilterArray<T, V, C> :
-        T extends Obj ? FilterObj<T, V, C> :
+        T extends Record<PropertyKey, any> ? FilterObj<T, V, C> :
             never;
 
 type FilterObj<T, V, C extends boolean> =

@@ -5,7 +5,7 @@
  ******************************************************************************/
 
 import { assertType } from "typelevel-assert";
-import { Combine, Equals, Filter, Is, Keys, Not, Obj, Paths, Values } from "../src";
+import { Combine, Equals, Extends, Filter, Is, Keys, Not, Obj, Paths, Values } from "../src";
 
 { // Obj
 
@@ -38,6 +38,20 @@ import { Combine, Equals, Filter, Is, Keys, Not, Obj, Paths, Values } from "../s
 }
 
 { // Keys
+
+    { // Key should behave like { [x in keyof any]: any }
+        type Actual = Keys<any>;
+        type Expected = keyof any;
+        assertType<Is<Actual, Expected>>();
+    }
+
+    { // { [x in Keys<any>]: any } should fix { [x in keyof any]: any }
+        type Actual = { [x in Keys<any>]: any };
+        type Expected = { [x in keyof any]: any };
+        assertType<Not<Is<Actual, Expected>>>();
+        assertType<Is<Expected, { [x: string]: any }>>();
+        assertType<Is<Actual, { [x: PropertyKey]: any }>>();
+    }
 
     { // Keys<any> should behave like keyof any
         type Actual = Keys<any>;
@@ -155,15 +169,45 @@ import { Combine, Equals, Filter, Is, Keys, Not, Obj, Paths, Values } from "../s
     }
 
     { // Paths should handle classes and interfaces
-        class A { a: number }
-        interface B { b: boolean }
-        assertType<Is<Paths<A>, never>>();
-        assertType<Is<Paths<B>, never>>();
+        class A { a: { b: number } }
+        interface B { a: { b: number } }
+        type Expected = { 'a.b': number };
+        assertType<Is<Paths<A>, Expected>>();
+        assertType<Is<Paths<B>, Expected>>();
     }
 
     { // Paths should work for type T = {}
         type Actual = Paths<{}>;
         type Expected = {};
+        assertType<Is<Actual, Expected>>();
+    }
+
+    { // Paths should work for empty arrays
+        type Actual = Paths<[]>;
+        type Expected = { [x: `${number}`]: never};
+        assertType<Extends<Actual, Expected>>();
+    }
+
+    { // Paths should work for non-empty arrays
+        type Actual = Paths<[1, 2]>;
+        type Expected = { [x: `${number}`]: 1 | 2};
+        assertType<Extends<Actual, Expected>>();
+        assertType<Not<Is<Actual, never>>>();
+    }
+
+    { // Paths should work for functions
+        type Actual = Paths<() => void>;
+        type Expected = {};
+        assertType<Is<Actual, Expected>>();
+    }
+
+    { // Paths should work for functions with properties
+        interface Func {
+            (): void;
+            b: string;
+        }
+        type Actual = Paths<Func>;
+        type Expected = { b: string };
         assertType<Is<Actual, Expected>>();
     }
 
