@@ -168,12 +168,20 @@ import { Combine, Equals, Extends, Filter, Is, Keys, Not, Obj, Paths, Values } f
         assertType<Is<Paths<void>, never>>();
     }
 
-    { // Paths should handle classes and interfaces
+    { // Paths should not handle classes and interfaces in Strict mode
+        class A { a: { b: number } }
+        interface B { a: { b: number } }
+        type Expected = never;
+        assertType<Is<Paths<A>, Expected>>();
+        assertType<Is<Paths<B>, Expected>>();
+    }
+
+    { // Paths should handle classes and interfaces in Strict mode
         class A { a: { b: number } }
         interface B { a: { b: number } }
         type Expected = { 'a.b': number };
-        assertType<Is<Paths<A>, Expected>>();
-        assertType<Is<Paths<B>, Expected>>();
+        assertType<Is<Paths<A, { Strict: false }>, Expected>>();
+        assertType<Is<Paths<B, { Strict: false }>, Expected>>();
     }
 
     { // Paths should work for type T = {}
@@ -188,25 +196,47 @@ import { Combine, Equals, Extends, Filter, Is, Keys, Not, Obj, Paths, Values } f
         assertType<Extends<Actual, Expected>>();
     }
 
-    { // Paths should work for non-empty arrays
+    { // Paths should not work for non-empty arrays if Strict
         type Actual = Paths<[1, 2]>;
+        type Expected = never;
+        assertType<Is<Actual, Expected>>();
+    }
+
+    { // Paths should work for non-empty arrays if not Strict
+        type Actual = Paths<[1, 2], { Strict: false }>;
         type Expected = { [x: `${number}`]: 1 | 2};
         assertType<Extends<Actual, Expected>>();
         assertType<Not<Is<Actual, never>>>();
     }
 
-    { // Paths should work for functions
+    { // Paths should not work for functions if Strict
         type Actual = Paths<() => void>;
+        type Expected = never;
+        assertType<Is<Actual, Expected>>();
+    }
+
+    { // Paths should work for functions if not Strict
+        type Actual = Paths<() => void, { Strict: false }>;
         type Expected = {};
         assertType<Is<Actual, Expected>>();
     }
 
-    { // Paths should work for functions with properties
+    { // Paths should not work for functions with properties if Strict
         interface Func {
             (): void;
             b: string;
         }
         type Actual = Paths<Func>;
+        type Expected = never;
+        assertType<Is<Actual, Expected>>();
+    }
+
+    { // Paths should work for functions with properties if not Strict
+        interface Func {
+            (): void;
+            b: string;
+        }
+        type Actual = Paths<Func, { Strict: false }>;
         type Expected = { b: string };
         assertType<Is<Actual, Expected>>();
     }

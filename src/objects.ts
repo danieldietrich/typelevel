@@ -98,47 +98,55 @@ export type Values<T> = T[keyof T];
  * string literal types under the hood to concatenate keys. This is why only
  * keys in string | number are supported, symbols are ignored.
  *
- * | T                    | Paths<T>                  |
- * | -------------------- | ------------------------- |
- * | any                  | { [x: string]: any }      |
- * | unknown              | never                     |
- * | never                | never                     |
- * | {}                   | {}                        |
- * | { a: { b: 1 } }      | { 'a.b': 1 }              |
- * | { a: 1 } \| { b: 2 } | { 'a': 1 } \| { 'b': 2 }  |
- * | arrays               | supported                 |
- * | classes              | supported                 |
- * | interfaces           | supported                 |
- * | functions            | supported                 |
- * | other-types          | never                     |
+ * | T                    | Paths<T> = Paths<T, true> | Paths<T, false>          |
+ * | -------------------- | ------------------------- | ------------------------ |
+ * | any                  | { [x: string]: any }      | { [x: string]: any }     |
+ * | unknown              | never                     | never                    |
+ * | never                | never                     | never                    |
+ * | {}                   | {}                        | {}                       |
+ * | { a: { b: 1 } }      | { 'a.b': 1 }              | { 'a.b': 1 }             |
+ * | { a: 1 } \| { b: 2 } | { 'a': 1 } \| { 'b': 2 }  | { 'a': 1 } \| { 'b': 2 } |
+ * | arrays               | never                     | supported                |
+ * | classes              | never                     | supported                |
+ * | interfaces           | never                     | supported                |
+ * | functions            | never                     | supported                |
+ * | other-types          | never                     | never                    |
  *
  * Paths distributes union types.
  *
  * @param T a union type
+ * @param Options a PathsOptions type
  * @returns a union of flattened objects
  */
-export type Paths<T> =
+export type Paths<T, Options extends PathsOptions = { Strict: true }> =
     Or<Is<T, {}>, IsUniversal<T>> extends true
         ? T
-        : T extends Record<PropertyKey, any>
-            ? Combine<UnionToIntersection<_Paths<T>>>
+        : T extends Record<PropertyKey, Options['Strict'] extends true ? unknown : any>
+            ? Combine<UnionToIntersection<_Paths<T, Options>>>
             : never;
 
-type _Paths<T> =
-    TupledPaths<T> extends infer P
+/**
+ * Options for Paths.
+ */
+export type PathsOptions = {
+    Strict?: boolean  // descends only into Obj types when true (default: true)
+};
+
+type _Paths<T, Options extends PathsOptions> =
+    TupledPaths<T, Options> extends infer P
         ? P extends [string, unknown]
             ? { [K in `${P[0]}`]: P[1] }
             : never
         : never;
 
 // currently symbol keys are not supported
-type TupledPaths<T, K = Keys<T>> =
-    T extends Record<PropertyKey, any>
+type TupledPaths<T, Options extends PathsOptions, K = Keys<T>> =
+    T extends Record<PropertyKey, Options['Strict'] extends true ? unknown : any>
         ? K extends string | number
             ? IsUniversal<T[K]> extends true
                 ? [`${K}`, T[K]]
                 : T[K] extends Record<string | number, unknown>
-                    ? TupledPaths<T[K]> extends infer F
+                    ? TupledPaths<T[K], Options> extends infer F
                         ? F extends [string, unknown]
                             ? [`${K}.${F[0]}`, F[1]]
                             : never
@@ -163,25 +171,32 @@ type TupledPaths<T, K = Keys<T>> =
  *
  * @param T a union of arrays and objects (distributed)
  * @param V a union of types that will be compared to the values of T (non-distributed)
- * @param C a boolean condition which negates the filter, if false
+ * @param Options a FilterOptions type
  * @returrns a filtered version of T or never
  */
-export type Filter<T, V, C extends boolean = true> =
-    T extends any[] ? FilterArray<T, V, C> :
-        T extends Record<PropertyKey, any> ? FilterObj<T, V, C> :
+export type Filter<T, V, Options extends FilterOptions = { Cond: true }> =
+    T extends any[] ? FilterArray<T, V, Options> :
+        T extends Record<PropertyKey, any> ? FilterObj<T, V, Options> :
             never;
 
-type FilterObj<T, V, C extends boolean> =
+/**
+ * Options for Filter.
+ */
+export type FilterOptions = {
+    Cond?: boolean // a boolean condition which negates the filter, if false (default: true)
+};
+
+type FilterObj<T, V, Options extends FilterOptions> =
     Pick<T, {
         [K in keyof T]-?: Extends<T[K], V> extends true
-            ? C extends true ? K : never
-            : C extends true ? never : K
+            ? Options['Cond'] extends true ? K : never
+            : Options['Cond'] extends true ? never : K
     }[keyof T]>;
 
-type FilterArray<A, V, C extends boolean> =
+type FilterArray<A, V, Options extends FilterOptions> =
     A extends [] ? [] :
         A extends [infer H, ...infer T]
             ? Extends<H, V> extends true
-                ? C extends true ? [H, ...FilterArray<T, V, C>] : FilterArray<T, V, C>
-                : C extends true ? FilterArray<T, V, C> : [H, ...FilterArray<T, V, C>]
+                ? Options['Cond'] extends true ? [H, ...FilterArray<T, V, Options>] : FilterArray<T, V, Options>
+                : Options['Cond'] extends true ? FilterArray<T, V, Options> : [H, ...FilterArray<T, V, Options>]
             : [];
