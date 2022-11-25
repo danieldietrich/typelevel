@@ -16,9 +16,11 @@
   "scripts": {
     "prepare": "npm run clean && npm run build && npm run lint",
     "build": "tsc",
+    "build:watch": "tsc -w",
     "clean": "shx rm -rf lib",
     "lint": "eslint src test --ext .ts",
-    "watch": "tsc -w"
+    "test": "tsc --noEmit -p tsconfig.test.json",
+    "test:watch": "tsc --noEmit -p tsconfig.test.json -w"
   },
   "repository": {
     "type": "git",

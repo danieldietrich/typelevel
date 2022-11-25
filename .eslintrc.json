@@ -12,7 +12,7 @@
     ],
     "parser": "@typescript-eslint/parser",
     "parserOptions": {                                             // [typescript-eslint parser configuration](https://github.com/typescript-eslint/typescript-eslint/tree/master/packages/parser#configuration)
-        "project": "tsconfig.eslint.json",                         // mandatory when using types
+        "project": "tsconfig.test.json",                           // mandatory when using types
         "sourceType": "module"                                     // needed in order to use import declarations
     },
     "plugins": [
