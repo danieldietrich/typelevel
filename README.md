@@ -1,3 +1,5 @@
+<!-- markdownlint-disable MD033 -->
+
 <div id="typelevel-logo" align="center">
   <img alt="TypeLevel Logo Dark Mode" src="https://user-images.githubusercontent.com/743833/196892454-19e7eb18-7434-46de-a476-d39606507692.png#gh-dark-mode-only" width=640>
   <img alt="TypeLevel Logo Light Mode" src="https://user-images.githubusercontent.com/743833/196917074-f23107b9-c408-4267-9ab1-e0964fb576ba.png#gh-light-mode-only" width=640>
@@ -40,14 +42,13 @@ npm i -D typescript-typelevel
 
 | Type                                               |
 | -------------------------------------------------- |
-| `Fn<A extends any[] = any[], R extends any = any>` | 
+| `Fn<A extends any[] = any[], R extends any = any>` |
 
 ### Objects
 
 | Type                                     |
 | ---------------------------------------- |
 | `Obj`                                    |
-| `Keys<T>`                                |
 | `Values<T>`                              |
 | `Paths<T>`                               |
 | `Combine<T>`                             |
@@ -83,7 +84,7 @@ npm i -D typescript-typelevel
 | ---------------------------------------------------- |
 | `Check<T>`                                           |
 | `CheckError<Message = any, Cause = any, Help = any>` |
-| `CheckResult<T, C extends Check<T>[], K extends PropertyKey = 'typelevel_error'>` |
+| `CheckResult<T, C extends Check<T>[], K extends string = 'typelevel_error'>` |
 
 ## The Essence of TypeScript
 
@@ -100,7 +101,7 @@ TypeScript (TS) adds a static type system on top of JS, we say TS is a superset 
 
 ### [Built-in types](https://www.typescriptlang.org/docs/handbook/2/everyday-types.html)
 
-* `{}` indexed arrays aka 'objects'
+* `{}` object types
 * `[]` arrays and tuples
 * `() => T` functions
 * `string`, `number`, `boolean`, `bigint`, `symbol`, `undefined`, `null` primitive types
@@ -149,7 +150,7 @@ Hint on matching objects:
 * `` `..${T}..` ``</code> [template literal type](https://www.typescriptlang.org/docs/handbook/2/template-literal-types.html)
 * `{ [K in keyof T]: U }` [mapped type](https://www.typescriptlang.org/docs/handbook/2/mapped-types.html)
 * `T extends U ? V : W` [conditional type](https://www.typescriptlang.org/docs/handbook/2/conditional-types.html)
-* `T extends infer U ? V : W` [inferred type]()
+* `T extends infer U ? V : W` [inferred type](https://www.typescriptlang.org/docs/handbook/2/conditional-types.html#inferring-within-conditional-types)
 
 _Note: [`typeof`](https://www.typescriptlang.org/docs/handbook/2/typeof-types.html) was intentionally not mentioned because it does not operate on the type level._
 
@@ -157,8 +158,7 @@ _Note: [`typeof`](https://www.typescriptlang.org/docs/handbook/2/typeof-types.ht
 
 One of the most important concepts in TS is the [distribution of union types over conditional types](https://www.typescriptlang.org/docs/handbook/2/conditional-types.html#distributive-conditional-types).
 
-_This [Stack Overflow answer](https://stackoverflow.com/questions/62084836/what-does-it-mean-for-a-type-to-distribute-over-unions) by [Karol Majewski
-](https://stackoverflow.com/users/10325032/karol-majewski) describes it best:_
+_This [Stack Overflow answer](https://stackoverflow.com/questions/62084836/what-does-it-mean-for-a-type-to-distribute-over-unions) by [Karol Majewski](https://stackoverflow.com/users/10325032/karol-majewski) describes it best:_
 
 > The term _distributive_ refers to how union types should be treated when subjected to type-level operations (such as `keyof` or mapped types).
 >

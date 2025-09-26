@@ -15,4 +15,4 @@
  * @param A - an array of argument types, default any[]
  * @param R - the return type, default any
  */
-export type Fn<A extends any[] = any[], R extends any = any> = (...args: A) => R;
+export type Fn<A extends any[] = any[], R = any> = (...args: A) => R;

@@ -4,8 +4,8 @@
  * terms of the MIT License, which is available in the project root.
  ******************************************************************************/
 
-import { Extends, Is, IsUniversal, Or } from "./predicates";
-import { UnionToIntersection } from "./utilities";
+import type { Extends, Is, IsUniversal, Or } from "./predicates";
+import type { UnionToIntersection } from "./utilities";
 
 /**
  * Combines all properties of an intersection type A & B.
@@ -17,24 +17,24 @@ import { UnionToIntersection } from "./utilities";
  * @param T a union of intersections
  * @returns a union of combined types
  */
-export type Combine<T> = { [K in (keyof T)]: T[K] };
+export type Combine<T> = { [K in keyof T]: T[K] };
 
 /**
  * Obj represents an object literal type. Obj is syntactic sugar for
- * Record<PropertyKey, unknown>.
+ * Record<string, unknown>.
  *
  * TypeScript has the following built-in types to match objects:
  *
- * • Record<PropertyKey, unknown> any object literal type { ... } with an index structure
- * • Record<PropertyKey, any> like Record<PropertyKey, unknown> but also interfaces, classes, arrays and functions
+ * • Record<string, unknown> any object literal type { ... } with an index structure
+ * • Record<string, any> like Record<string, unknown> but also interfaces, classes, arrays and functions
  * • Object any value (primitive, non-primitive)
- * • object any non-primitive type, same as Record<PropertyKey, any> but no index structure
+ * • object any non-primitive type, same as Record<string, any> but no index structure
  * • {} empty object, any non-nullish value
  *
  * Obj does not match interfaces or classes because they are possible target
  * for declaration merging, their properties are not fully known.
  *
- * | T                  | T extends Obj = Record<PropertyKey, unknown> | T extends Record<PropertyKey, any> | T extends object  | T extends Object  | T extends {} |
+ * | T                  | T extends Obj = Record<string, unknown> | T extends Record<string, any> | T extends object  | T extends Object  | T extends {} |
  * | ------------------ | ------- | ------- | ------- | ------- | ------- |
  * | any                | boolean | boolean | boolean | boolean | boolean |
  * | unknown            | false   | false   | false   | false   | false   |
@@ -59,23 +59,7 @@ export type Combine<T> = { [K in (keyof T)]: T[K] };
  *
  * See https://github.com/microsoft/TypeScript/issues/42825#issuecomment-780873604
  */
-export type Obj = Record<PropertyKey, unknown>;
-
-/**
- * Convenience type alias for keyof T, with a fix for one common mistake:
- *
- *    { [x in keyof any]: any }
- *  = { [x: string]: any }
- * != { [x: string]: any; [x: number]: any; [x: symbol]: never }
- *  = { [_ in (keyof any)]: any }
- *  = { [_ in Keys<T>]: any }
- *
- * Keys does not distribute union types.
- *
- * @param T a type
- * @returns keyof T
- */
-export type Keys<T> = keyof T;
+export type Obj = Record<string, unknown>;
 
 /**
  * Syntactic sugar for T[keyof T].
@@ -93,7 +77,7 @@ export type Values<T> = T[keyof T];
  *
  * { a: { b: { c: number } } } => { 'a.b.c': number }
  *
- * Paths intentionally only traverses types of shape Obj = Record<PropertyKey, unknown>.
+ * Paths intentionally only traverses types of shape Obj = Record<string, unknown>.
  * Interfaces, classes and arrays are seen as leafs. Currently Paths uses
  * string literal types under the hood to concatenate keys. This is why only
  * keys in string | number are supported, symbols are ignored.
@@ -118,42 +102,49 @@ export type Values<T> = T[keyof T];
  * @param Options a PathsOptions type
  * @returns a union of flattened objects
  */
-export type Paths<T, Options extends PathsOptions = { Strict: true }> =
-    Or<Is<T, {}>, IsUniversal<T>> extends true
-        ? T
-        : T extends Record<PropertyKey, Options['Strict'] extends true ? unknown : any>
-            ? Combine<UnionToIntersection<_Paths<T, Options>>>
-            : never;
+export type Paths<T, Options extends PathsOptions = { Strict: true }> = Or<
+  Is<T, object>,
+  IsUniversal<T>
+> extends true
+  ? T
+  : T extends Record<string, Options["Strict"] extends true ? unknown : any>
+    ? Combine<UnionToIntersection<_Paths<T, Options>>>
+    : never;
 
 /**
  * Options for Paths.
  */
 export type PathsOptions = {
-    Strict?: boolean  // descends only into Obj types when true (default: true)
+  Strict?: boolean; // descends only into Obj types when true (default: true)
 };
 
-type _Paths<T, Options extends PathsOptions> =
-    TupledPaths<T, Options> extends infer P
-        ? P extends [string, unknown]
-            ? { [K in `${P[0]}`]: P[1] }
-            : never
-        : never;
+type _Paths<T, Options extends PathsOptions> = TupledPaths<
+  T,
+  Options
+> extends infer P
+  ? P extends [string, unknown]
+    ? { [K in `${P[0]}`]: P[1] }
+    : never
+  : never;
 
 // currently symbol keys are not supported
-type TupledPaths<T, Options extends PathsOptions, K = Keys<T>> =
-    T extends Record<PropertyKey, Options['Strict'] extends true ? unknown : any>
-        ? K extends string | number
-            ? IsUniversal<T[K]> extends true
-                ? [`${K}`, T[K]]
-                : T[K] extends Record<string | number, unknown>
-                    ? TupledPaths<T[K], Options> extends infer F
-                        ? F extends [string, unknown]
-                            ? [`${K}.${F[0]}`, F[1]]
-                            : never
-                        : never
-                    : [`${K}`, T[K]]
+type TupledPaths<
+  T,
+  Options extends PathsOptions,
+  K = keyof T
+> = T extends Record<string, Options["Strict"] extends true ? unknown : any>
+  ? K extends string
+    ? IsUniversal<T[K]> extends true
+      ? [`${K}`, T[K]]
+      : T[K] extends Record<string | number, unknown>
+        ? TupledPaths<T[K], Options> extends infer F
+          ? F extends [string, unknown]
+            ? [`${K}.${F[0]}`, F[1]]
             : never
-        : never;
+          : never
+        : [`${K}`, T[K]]
+    : never
+  : never;
 
 /**
  * Filters arrays and objects of type T by comparing their values with the given
@@ -174,29 +165,44 @@ type TupledPaths<T, Options extends PathsOptions, K = Keys<T>> =
  * @param Options a FilterOptions type
  * @returrns a filtered version of T or never
  */
-export type Filter<T, V, Options extends FilterOptions = { Cond: true }> =
-    T extends any[] ? FilterArray<T, V, Options> :
-        T extends Record<PropertyKey, any> ? FilterObj<T, V, Options> :
-            never;
+export type Filter<
+  T,
+  V,
+  Options extends FilterOptions = { Cond: true }
+> = T extends any[]
+  ? FilterArray<T, V, Options>
+  : T extends Record<string, any>
+    ? FilterObj<T, V, Options>
+    : never;
 
 /**
  * Options for Filter.
  */
 export type FilterOptions = {
-    Cond?: boolean // a boolean condition which negates the filter, if false (default: true)
+  Cond?: boolean; // a boolean condition which negates the filter, if false (default: true)
 };
 
-type FilterObj<T, V, Options extends FilterOptions> =
-    Pick<T, {
-        [K in keyof T]-?: Extends<T[K], V> extends true
-            ? Options['Cond'] extends true ? K : never
-            : Options['Cond'] extends true ? never : K
-    }[keyof T]>;
+type FilterObj<T, V, Options extends FilterOptions> = Pick<
+  T,
+  {
+    [K in keyof T]-?: Extends<T[K], V> extends true
+      ? Options["Cond"] extends true
+        ? K
+        : never
+      : Options["Cond"] extends true
+        ? never
+        : K;
+  }[keyof T]
+>;
 
-type FilterArray<A, V, Options extends FilterOptions> =
-    A extends [] ? [] :
-        A extends [infer H, ...infer T]
-            ? Extends<H, V> extends true
-                ? Options['Cond'] extends true ? [H, ...FilterArray<T, V, Options>] : FilterArray<T, V, Options>
-                : Options['Cond'] extends true ? FilterArray<T, V, Options> : [H, ...FilterArray<T, V, Options>]
-            : [];
+type FilterArray<A, V, Options extends FilterOptions> = A extends []
+  ? []
+  : A extends [infer H, ...infer T]
+    ? Extends<H, V> extends true
+      ? Options["Cond"] extends true
+        ? [H, ...FilterArray<T, V, Options>]
+        : FilterArray<T, V, Options>
+      : Options["Cond"] extends true
+        ? FilterArray<T, V, Options>
+        : [H, ...FilterArray<T, V, Options>]
+    : [];

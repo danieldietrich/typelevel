@@ -4,8 +4,8 @@
  * terms of the MIT License, which is available in the project root.
  ******************************************************************************/
 
-export * from './functions';
-export * from './objects';
-export * from './predicates';
-export * from './type-checker';
-export * from './utilities';
+export * from "./functions";
+export * from "./objects";
+export * from "./predicates";
+export * from "./type-checker";
+export * from "./utilities";

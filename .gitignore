@@ -1,6 +1,4 @@
 .DS_Store
 *.tgz
-*DELME.ts
-coverage/
 lib/
 node_modules/

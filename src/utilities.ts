@@ -12,8 +12,9 @@
  * @param a tuple
  * @returns an intersection
  */
-export type TupleToIntersection<T extends any[]> =
-    UnionToIntersection<TupleToUnion<T>>;
+export type TupleToIntersection<T extends any[]> = UnionToIntersection<
+  TupleToUnion<T>
+>;
 
 /**
  * Tuple to union
@@ -23,8 +24,7 @@ export type TupleToIntersection<T extends any[]> =
  * @param a tuple
  * @returns an union
  */
-export type TupleToUnion<T extends any[]> =
-    T[number];
+export type TupleToUnion<T extends any[]> = T[number];
 
 /**
  * Union to intersection
@@ -34,10 +34,13 @@ export type TupleToUnion<T extends any[]> =
  * @param a union
  * @returns an intersection
  */
-export type UnionToIntersection<U> =
-    (U extends any ? (arg: U) => void : never) extends ((arg: infer I) => void)
-        ? I
-        : never;
+export type UnionToIntersection<U> = (
+  U extends any
+    ? (arg: U) => void
+    : never
+) extends (arg: infer I) => void
+  ? I
+  : never;
 
 /**
  * Union to tuple. Use this with caution, the order of the tuple
@@ -48,12 +51,12 @@ export type UnionToIntersection<U> =
  * @param a union
  * @returns a tuple
  */
-export type UnionToTuple<T> =
-    [T] extends [never]
-        ? []
-        : [...UnionToTuple<Exclude<T, LastOf<T> >>, LastOf<T>];
+export type UnionToTuple<T> = [T] extends [never]
+  ? []
+  : [...UnionToTuple<Exclude<T, LastOf<T>>>, LastOf<T>];
 
-type LastOf<T> =
-    UnionToIntersection<T extends any ? () => T : never> extends () => infer R
-        ? R
-        : never;
+type LastOf<T> = UnionToIntersection<
+  T extends any ? () => T : never
+> extends () => infer R
+  ? R
+  : never;

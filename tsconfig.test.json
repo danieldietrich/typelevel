@@ -1,12 +1,10 @@
 {
-    "compilerOptions": {
-        "emitDeclarationOnly": false,
-        "rootDir": "",
-        "rootDirs": ["src", "test"],
-        "strictPropertyInitialization": false
-    },
-    "extends": "./tsconfig.json",
-    "include": [
-        "test/**/*.ts"
-    ]
+  "compilerOptions": {
+    "emitDeclarationOnly": false,
+    "rootDir": "",
+    "rootDirs": ["src", "test"],
+    "strictPropertyInitialization": false
+  },
+  "extends": "./tsconfig.json",
+  "include": ["test/**/*.ts"]
 }

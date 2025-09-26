@@ -4,7 +4,7 @@
  * terms of the MIT License, which is available in the project root.
  ******************************************************************************/
 
-import { Filter } from "./objects";
+import type { Filter } from "./objects";
 
 /**
  * Represents a check of type T. Passes through T if the check is a success,
@@ -30,12 +30,15 @@ export type Check<T> = T | CheckError;
  * @param K optional property key of an error, by default 'typelevel_error'
  * @returns T if all checks succeeded, otherwise { K: CheckError[] }
  */
-export type CheckResult<T, C extends Check<T>[], K extends PropertyKey = 'typelevel_error'> =
-    Filter<C, CheckError> extends infer E
-        ? E extends []
-            ? T
-            : { [Key in K]: E }
-        : never;
+export type CheckResult<
+  T,
+  C extends Check<T>[],
+  K extends string = "typelevel_error"
+> = Filter<C, CheckError> extends infer E
+  ? E extends []
+    ? T
+    : { [Key in K]: E }
+  : never;
 
 /**
  * Represents a type check error.
@@ -45,7 +48,7 @@ export type CheckResult<T, C extends Check<T>[], K extends PropertyKey = 'typele
  * @param Help an optional link to the documentation
  */
 export type CheckError<Message = any, Cause = any, Help = any> = {
-    message: Message;
-    cause: Cause;
-    help: Help;
+  message: Message;
+  cause: Cause;
+  help: Help;
 };

@@ -1,0 +1,25 @@
+{
+  "files": {
+    "includes": ["**", "!**/node_modules", "!**/lib"]
+  },
+  "formatter": {
+    "useEditorconfig": true
+  },
+  "javascript": {
+    "formatter": {
+      "trailingCommas": "none"
+    }
+  },
+  "linter": {
+    "rules": {
+      "complexity": {
+        "noBannedTypes": "off",
+        "noFlatMapIdentity": "off",
+        "noUselessLoneBlockStatements": "off"
+      },
+      "suspicious": {
+        "noExplicitAny": "off"
+      }
+    }
+  }
+}

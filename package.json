@@ -17,8 +17,9 @@
     "prepare": "npm run clean && npm run build && npm run lint",
     "build": "tsc",
     "build:watch": "tsc -w",
-    "clean": "shx rm -rf lib",
-    "lint": "eslint src test --ext .ts",
+    "clean": "rimraf lib",
+    "lint": "biome check",
+    "lint:fix": "biome check --fix",
     "test": "tsc --noEmit -p tsconfig.test.json",
     "test:watch": "tsc --noEmit -p tsconfig.test.json -w"
   },
@@ -37,13 +38,9 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^5.38.1",
-    "@typescript-eslint/parser": "^5.38.1",
-    "eslint": "^8.24.0",
-    "eslint-plugin-typescript-enum": "^2.1.0",
-    "eslint-plugin-unused-imports": "^2.0.0",
-    "shx": "^0.3.4",
-    "typelevel-assert": "^0.1.1",
-    "typescript": "^4.8.4"
+    "@biomejs/biome": "^2.2.4",
+    "rimraf": "^6.0.1",
+    "typelevel-assert": "^0.2.2",
+    "typescript": "^5.9.2"
   }
 }
